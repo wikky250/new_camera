@@ -1,9 +1,10 @@
 add_library(uidemo INTERFACE)
 
 target_sources(uidemo
-PUBLIC
+INTERFACE
 	QtCameraTest.h
 	QtCameraTest.cpp
+PRIVATE
 	QtCameraTest.ui
 )
 

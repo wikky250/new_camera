@@ -1,44 +1,43 @@
-include(fetch/OpenCV)
+find_package(OpenCV REQUIRED)
 include(fetch/spdlog)
-include(functions/qt_translation_support)
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-find_package(OpenCV)
-find_package(Qt5 COMPONENTS Core Gui Widgets Network Sql REQUIRED)
-
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
-
-
-add_subdirectory(UIDemo)
-
-if(DISABLE_DEBUG_INFO)
-    add_executable(CameraTest WIN32)
-else()
-    add_executable(CameraTest)
+if(CAMERA_HIK_SUPPORT)
+  message(STATUS "src CAMERA_HIK_SUPPORT defined")
+  add_subdirectory(hik)
+  list(APPEND DEP_CAMERA_LIB hik_camera)
 endif()
 
-target_sources(CameraTest
-PRIVATE
-    main.cpp        
-)
-target_link_libraries(CameraTest
-PRIVATE
-    uidemo
-    Qt5::Widgets
-    Qt5::Core
-)
+if(CAMERA_BALSER_SUPPORT)
+  message(STATUS "src CAMERA_BALSER_SUPPORT defined")
+  add_subdirectory(balser)
+  list(APPEND DEP_CAMERA_LIB balser_camera)
+endif()
 
-add_custom_command(
-    TARGET CameraTest
-    POST_BUILD
-    COMMAND "$<TARGET_FILE_DIR:Qt5::qmake>/windeployqt.exe" "--no-translations" $<TARGET_FILE:CameraTest>
-    WORKING_DIRECTORY $<TARGET_FILE_DIR:CameraTest>
-)
+if(CAMERA_DALSA_SUPPORT)
+  message(STATUS "src CAMERA_DALSA_SUPPORT defined")
+  add_subdirectory(dalsa)
+  list(APPEND DEP_CAMERA_LIB dalsa_camera)
+endif()
 
-add_custom_command(TARGET CameraTest POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:CameraTest> $<TARGET_FILE_DIR:CameraTest>
-    COMMAND_EXPAND_LISTS
-)
+if(CAMERA_BAUMER_SUPPORT)
+  message(STATUS "src CAMERA_BAUMER_SUPPORT defined")
+  add_subdirectory(baumer)
+  list(APPEND DEP_CAMERA_LIB baumer_camera)
+endif()
+
+if(CAMERA_DAHUA_SUPPORT)
+  message(STATUS "src CAMERA_DAHUA_SUPPORT defined")
+  add_subdirectory(dahua)
+  list(APPEND DEP_CAMERA_LIB dahua_camera)
+endif()
+
+file(GLOB srcs *.cpp *.h)
+
+add_library(camera_manager SHARED ${srcs})
+
+target_include_directories(
+  camera_manager PUBLIC ${OpenCV_INCLUDE_DIRS} spdlog::spdlog
+                        ${PROJECT_SOURCE_DIR}/include ${THIRDPARTY_DIR} util)
+
+target_link_libraries(camera_manager PRIVATE ${OpenCV_LIBS} spdlog::spdlog
+                                             ${DEP_CAMERA_LIB})

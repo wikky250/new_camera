@@ -1,6 +1,5 @@
 include(fetch/OpenCV)
 include(fetch/spdlog)
-include(functions/qt_translation_support)
 
 find_package(OpenCV)
 find_package(Qt5 COMPONENTS Core Gui Widgets Network Sql REQUIRED)

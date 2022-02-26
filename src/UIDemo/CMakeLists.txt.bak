@@ -1,0 +1,20 @@
+find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
+
+add_library(uidemo INTERFACE)
+
+target_sources(uidemo
+INTERFACE
+	QtCameraTest.h
+	QtCameraTest.cpp
+	QtCameraTest.ui
+)
+target_include_directories(uidemo
+INTERFACE ${PROJECT_SOURCE_DIR}/src
+INTERFACE ./
+)
+
+target_link_libraries(uidemo
+INTERFACE
+	Qt5::Widgets
+    Qt5::Core
+)

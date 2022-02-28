@@ -45,10 +45,7 @@ void QtCameraTest::InitProgram()
 
 void QtCameraTest::onInitCamera()
 {
-	QLibrary* LocalFileDLL = new QLibrary(qApp->applicationDirPath() + "/" + ui.comboBox_CameraType->currentText());
+	QLibrary* LocalFileDLL = new QLibrary(qApp->applicationDirPath() + "/" + ui.comboBox_HaveDll->currentText());
 	pExportCamera CreateLocalCamera = (pExportCamera)(LocalFileDLL->resolve("CreateExportCameraObj"));//µ¼³öÀà
 	m_camera = CreateLocalCamera();
-	th = new QThread;
-	((QObject*)l_camera)->moveToThread(th);
-	th->start();
 }

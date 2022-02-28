@@ -19,69 +19,6 @@ const cameramanager::DeviceInfo &BaslerCamera::getDeviceInfo()
     return m_device_info;
 }
 
-int BaslerCamera::enumCamera(std::vector<cameramanager::DeviceInfo> &device_list)
-{
-    LOGI("+");
-    LOGI("Compile PYLON_VERSION:{}.{}.{}.{}", PYLON_VERSION_MAJOR, PYLON_VERSIONSTRING_MINOR,
-         PYLON_VERSIONSTRING_SUBMINOR, PYLON_VERSION_BUILD);
-    LOGI("Runtime PYLON_VERSION:{}", VersionInfo::getVersionString());
-    // Before using any pylon methods, the pylon runtime must be initialized.
-    PylonInitialize();
-
-    int exitCode = 0;
-    try
-    {
-        DeviceInfoList_t info_list;
-        CTlFactory::GetInstance().EnumerateDevices(info_list);
-        for (auto &it = info_list.begin(); it != info_list.end(); ++it)
-        {
-            const std::string device_vendor_name = it->GetVendorName();
-            LOGD("device_vendor_name:{}", device_vendor_name);
-            if (device_vendor_name != "Basler")
-            {
-                continue;
-            }
-
-            cameramanager::DeviceInfo device_info;
-            device_info.device_type = cameramanager::DeviceManufacturer::Basler;
-            device_info.model_name = it->GetModelName();
-            device_info.serial_number = it->GetSerialNumber();
-            device_info.full_name = it->GetFullName();
-
-            const std::string tlt_type_str = it->GetTLType().c_str();
-            LOGD("tlt_type_str:{}", tlt_type_str);
-
-            if (tlt_type_str == Pylon::TLType::TLTypeUSB)
-            {
-                device_info.layer_type = cameramanager::TransLayerType::Usb;
-            }
-            else if (tlt_type_str == Pylon::TLType::TLTypeCL)
-            {
-                device_info.layer_type = cameramanager::TransLayerType::CameraLink;
-            }
-            else if (tlt_type_str == Pylon::TLType::TLTypeGigE)
-            {
-                device_info.layer_type = cameramanager::TransLayerType::Gige;
-            }
-            else
-            {
-                device_info.layer_type = cameramanager::TransLayerType::Unknown;
-                LOGI("Unknown type:{}", tlt_type_str);
-            }
-            device_list.push_back(device_info);
-        }
-    }
-    catch (const GenericException &e)
-    {
-        // Error handling.
-        std::cerr << "An exception occurred." << std::endl << e.GetDescription() << std::endl;
-        exitCode = 1;
-    }
-
-    // Releases all pylon resources.
-    PylonTerminate();
-    return exitCode;
-}
 
 BaslerCamera::BaslerCamera() {}
 

@@ -21,7 +21,6 @@ public:
     BaslerCamera(const cameramanager::DeviceInfo &device_info);
     virtual ~BaslerCamera();
     virtual const cameramanager::DeviceInfo &getDeviceInfo();
-    static int enumCamera(std::vector<cameramanager::DeviceInfo> &device_list);
     virtual bool initCamera(const char* cameranumber);
     virtual bool isConnected();
     virtual bool uninitCamera();

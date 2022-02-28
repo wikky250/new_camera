@@ -16,8 +16,7 @@ public:
 
 private:
     //camera test
-	ICameraDevice* std::shared_ptr<ICameraDevice>m_camera;
-	QThread* th;
+    cameramanager::ICameraDevice* m_camera;
     //////////////////////////////////////////////////////////////////////////
 
 

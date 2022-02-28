@@ -92,28 +92,39 @@ BaslerCamera::~BaslerCamera()
     PylonTerminate();
 }
 
-bool BaslerCamera::initCamera()
+bool BaslerCamera::initCamera(const char* cameranumber)
 {
     bool ret = false;
-    // CreateDevice by fullname
-    m_camera = std::make_shared<CBaslerUniversalInstantCamera>(
-        CTlFactory::GetInstance().CreateDevice(CDeviceInfo().SetFullName(m_device_info.full_name.c_str())));
-    do
-    {
-        if (m_camera)
-        {
-            // Register the standard configuration event handler for enabling software triggering.
-            // The software trigger configuration handler replaces the default configuration
-            // as all currently registered configuration handlers are removed by setting the registration mode to
-            // RegistrationMode_ReplaceAll.
-            // m_camera->RegisterConfiguration(new CSoftwareTriggerConfiguration, RegistrationMode_Append,
-            // Cleanup_Delete); For demonstration purposes only, register another image event handler.
-            // m_camera->RegisterImageEventHandler(m_image_event_handler.get(), RegistrationMode_Append, Cleanup_None);
-            // Camera event processing must be activated first, the default is off.
-            // m_camera->GrabCameraEvents = true;
-            ret = true;
-        }
-    } while (0);
+
+
+
+	int exitCode = 0;
+	try
+	{
+		DeviceInfoList_t info_list;
+		CTlFactory::GetInstance().EnumerateDevices(info_list);
+		for (auto& it = info_list.begin(); it != info_list.end(); ++it)
+		{
+			const std::string device_vendor_name = it->GetVendorName();
+			LOGD("device_vendor_name:{}", device_vendor_name);
+			if (device_vendor_name != "Basler")
+			{
+				continue;
+			}
+            if (it->GetSerialNumber()!= cameranumber)
+			{
+				continue;
+            }
+            m_camera = std::make_shared<CBaslerUniversalInstantCamera>(CTlFactory::GetInstance().CreateDevice(*it));
+		}
+	}
+	catch (const GenericException& e)
+	{
+		// Error handling.
+		std::cerr << "An exception occurred." << std::endl << e.GetDescription() << std::endl;
+		exitCode = 1;
+	}
+	
     return ret;
 }
 
@@ -141,7 +152,7 @@ bool BaslerCamera::uninitCamera()
     return true;
 }
 
-bool BaslerCamera::openCamera(const char *config_file = nullptr)
+bool BaslerCamera::openCamera()
 {
     bool ret = false;
     if (m_camera)
@@ -446,3 +457,7 @@ bool BaslerCamera::setTriggerDelay(const double value)
 }
 
 }  // namespace smartmore
+extern "C" __declspec(dllexport) cameramanager::ICameraDevice * __stdcall CreateExportCameraObj()
+{
+	return new smartmore::BaslerCamera();
+};

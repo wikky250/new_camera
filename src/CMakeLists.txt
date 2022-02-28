@@ -1,5 +1,6 @@
 find_package(OpenCV REQUIRED)
 include(fetch/spdlog)
+include(fetch/json)
 
 if(CAMERA_HIK_SUPPORT)
   message(STATUS "src CAMERA_HIK_SUPPORT defined")
@@ -33,11 +34,12 @@ endif()
 
 file(GLOB srcs *.cpp *.h)
 
-add_library(camera_manager SHARED ${srcs})
-
-target_include_directories(
-  camera_manager PUBLIC ${OpenCV_INCLUDE_DIRS} spdlog::spdlog
-                        ${PROJECT_SOURCE_DIR}/include ${THIRDPARTY_DIR} util)
-
-target_link_libraries(camera_manager PRIVATE ${OpenCV_LIBS} spdlog::spdlog
-                                             ${DEP_CAMERA_LIB})
+#add_library(camera_manager SHARED ${srcs})
+#
+#target_include_directories(
+#  camera_manager PUBLIC ${OpenCV_INCLUDE_DIRS} spdlog::spdlog
+#                        ${PROJECT_SOURCE_DIR}/include ${THIRDPARTY_DIR} util)
+#
+#target_link_libraries(camera_manager PRIVATE ${OpenCV_LIBS} spdlog::spdlog
+#                                             ${DEP_CAMERA_LIB})
+#

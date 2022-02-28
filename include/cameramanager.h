@@ -9,6 +9,7 @@
  ****************************************************************************/
 
 #pragma once
+#define BUILD_BALSER_SDK
 
 #include "icameradevice.h"
 #include <memory>

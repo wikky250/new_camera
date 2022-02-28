@@ -1,7 +1,7 @@
 file(GLOB_RECURSE srcs *.cpp *.h, impl/*.cpp, impl/*.h)
 
 add_library(balser_camera
-STATIC
+SHARED
     ${srcs}
 )
 
@@ -9,9 +9,9 @@ target_include_directories(balser_camera
 PUBLIC
     ${OpenCV_INCLUDE_DIRS}
     spdlog::spdlog
+    ${PROJECT_SOURCE_DIR}/src/util
     ${PROJECT_SOURCE_DIR}/include
     ${THIRDPARTY_DIR}
-    ${PROJECT_SOURCE_DIR}/src/util
     ${THIRDPARTY_DIR}/pylon6/include
 )
 

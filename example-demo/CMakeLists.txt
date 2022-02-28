@@ -26,7 +26,16 @@ PRIVATE
     uidemo
     Qt5::Widgets
     Qt5::Core
+    spdlog::spdlog
 )
+target_include_directories(CameraTest
+PUBLIC
+    ${OpenCV_INCLUDE_DIRS}
+    ${PROJECT_SOURCE_DIR}/include
+    spdlog::spdlog
+    ${PROJECT_SOURCE_DIR}/src/util
+)
+
 
 add_custom_command(
     TARGET CameraTest

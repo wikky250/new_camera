@@ -14,17 +14,18 @@ using namespace Basler_UniversalCameraParams;
 
 namespace smartmore
 {
-class BaslerCamera
+class BaslerCamera:public cameramanager::ICameraDevice
 {
 public:
+	BaslerCamera();
     BaslerCamera(const cameramanager::DeviceInfo &device_info);
     virtual ~BaslerCamera();
     virtual const cameramanager::DeviceInfo &getDeviceInfo();
     static int enumCamera(std::vector<cameramanager::DeviceInfo> &device_list);
-    virtual bool initCamera();
+    virtual bool initCamera(const char* cameranumber);
     virtual bool isConnected();
     virtual bool uninitCamera();
-    virtual bool openCamera(const char *config_file);
+    virtual bool openCamera();
     virtual bool closeCamera();
     virtual bool startGrabbing(bool extern_trigger);
     virtual bool stopGrabbing();
@@ -42,6 +43,7 @@ private:
     std::shared_ptr<CBaslerUniversalInstantCamera> m_camera;
     bool m_extern_trigger = false;
 
-    BaslerCamera();
 };
+
 }  // namespace smartmore
+extern "C" __declspec(dllexport) cameramanager::ICameraDevice * __stdcall CreateExportCameraObj();

@@ -13,6 +13,7 @@ namespace cameramanager
 #define CameraEventLine0RisingEdge (0x01 << 1)
 #define CameraEventReadOut (0x01 << 2)
 
+
 enum class DeviceManufacturer
 {
     Unknown = 0,
@@ -61,14 +62,14 @@ struct DeviceInfo
     }
 };
 
-class __declspec(dllexport) ICameraDevice
+class ICameraDevice
 {
 public:
     virtual ~ICameraDevice() {}
 
-    virtual bool initCamera() = 0;
-    virtual bool registerEvent(uint16_t event) = 0;
-    virtual bool waitForEvent(uint16_t event, int32_t timeout_millseconds) = 0;
+    virtual bool initCamera(const char*) = 0;
+    //virtual bool registerEvent(uint16_t event) = 0;
+    //virtual bool waitForEvent(uint16_t event, int32_t timeout_millseconds) = 0;
     virtual bool openCamera() = 0;
     virtual bool isConnected() = 0;
     virtual bool startGrabbing(bool extern_trigger = false) = 0;
@@ -86,10 +87,13 @@ public:
     virtual bool getTriggerDelay(double &value) = 0;
     virtual bool setTriggerDelay(const double value) = 0;
 
-    virtual bool setShaftEncoderParam(const uint32_t drop, const uint32_t multiply) = 0;
-    virtual bool getShaftEncoderParam(uint32_t &drop, uint32_t &multiply) = 0;
+    //virtual bool setShaftEncoderParam(const uint32_t drop, const uint32_t multiply) = 0;
+    //virtual bool getShaftEncoderParam(uint32_t &drop, uint32_t &multiply) = 0;
 
-    virtual bool setCropParam(const uint32_t top, const uint32_t left, const uint32_t width, const uint32_t height) = 0;
-    virtual bool getCropParam(uint32_t &top, uint32_t &left, uint32_t &width, uint32_t &height) = 0;
+    //virtual bool setCropParam(const uint32_t top, const uint32_t left, const uint32_t width, const uint32_t height) = 0;
+    //virtual bool getCropParam(uint32_t &top, uint32_t &left, uint32_t &width, uint32_t &height) = 0;
 };
+
+typedef ICameraDevice* (__stdcall* pExportCamera)();
 }  // namespace cameramanager
+

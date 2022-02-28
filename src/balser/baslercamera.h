@@ -14,7 +14,7 @@ using namespace Basler_UniversalCameraParams;
 
 namespace smartmore
 {
-class BaslerCamera:public cameramanager::ICameraDevice
+class  BaslerCamera:public cameramanager::ICameraDevice
 {
 public:
 	BaslerCamera();

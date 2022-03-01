@@ -4,8 +4,11 @@
 #include <QLibrary>
 #include <QDir>
 #include <QThread>
+#include <QImage>
 #include "ui_QtCameraTest.h"
 #include "icameradevice.h"
+#include <intsafe.h>
+#include "opencv2/opencv.hpp"
 
 class QtCameraTest : public QMainWindow
 {
@@ -14,6 +17,8 @@ class QtCameraTest : public QMainWindow
 public:
     QtCameraTest(QWidget *parent = Q_NULLPTR);
 
+
+	bool GetImageFromCam();
 private:
     //camera test
     cameramanager::ICameraDevice* m_camera;
@@ -26,4 +31,6 @@ private:
     void InitProgram();
 public slots:
     void onInitCamera();
+	void onStartCamera();
+	void onStopCamera();
 };

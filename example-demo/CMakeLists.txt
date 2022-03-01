@@ -24,6 +24,7 @@ PRIVATE
 target_link_libraries(CameraTest
 PRIVATE
     uidemo
+    ${OpenCV_LIBS}
     Qt5::Widgets
     Qt5::Core
     spdlog::spdlog

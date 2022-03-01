@@ -20,11 +20,13 @@ const cameramanager::DeviceInfo &BaslerCamera::getDeviceInfo()
 }
 
 
-BaslerCamera::BaslerCamera() {}
+BaslerCamera::BaslerCamera() {
+	PylonInitialize();
+}
 
 BaslerCamera::~BaslerCamera()
 {
-    m_camera.reset();
+    //m_camera->reset();
     // Releases all pylon resources.
     PylonTerminate();
 }
@@ -85,7 +87,6 @@ bool BaslerCamera::uninitCamera()
         m_camera->Close();
     }
 
-    m_camera.reset();
     return true;
 }
 
@@ -127,20 +128,38 @@ bool BaslerCamera::closeCamera()
     return ret;
 }
 
-bool BaslerCamera::startGrabbing(bool extern_trigger)
+void catchIncircle(std::shared_ptr<CBaslerUniversalInstantCamera> cam,BaslerCamera * basler) {
+
+	CGrabResultPtr ptrGrabResult;
+	CImageFormatConverter converter;
+	converter.OutputPixelFormat = PixelType_BGR8packed;
+	while (cam->IsGrabbing())
+	{
+		// Retrieve grab results and notify the camera event and image event handlers.
+		cam->RetrieveResult(5000, ptrGrabResult, TimeoutHandling_ThrowException);
+		converter.OutputBitAlignment = OutputBitAlignment_MsbAligned;
+		converter.Convert(basler->pylonBGRdata, ptrGrabResult);
+		basler->callbackfunc(basler->pUser);
+		// Nothing to do here with the grab result The grab results are handled by the registered event handlers.
+	}
+}
+bool BaslerCamera::startGrabbing()
 {
-    m_extern_trigger = extern_trigger;
-    LOGD("m_extern_trigger:{}", m_extern_trigger);
-    m_camera->TriggerMode.TrySetValue(TriggerModeEnums::TriggerMode_On);
-    m_camera->TriggerSource.TrySetValue(TriggerSourceEnums::TriggerSource_Software);
+    //LOGD("m_extern_trigger:{}", m_extern_trigger);
+    //m_camera->TriggerMode.TrySetValue(TriggerModeEnums::TriggerMode_On);
+    //m_camera->TriggerSource.TrySetValue(TriggerSourceEnums::TriggerSource_Software);
 
     bool ret = false;
-    if (m_camera && m_camera->IsOpen() && !m_camera->IsGrabbing())
+    if (m_camera)
     {
         try
         {
+			m_camera->Open();
+			pylonBGRdata = CPylonImage::Create(PixelType_RGB8packed, m_camera->Width.GetValue(), m_camera->Height.GetValue());
             m_camera->StartGrabbing();
-            ret = true;
+
+			std::thread cam1(catchIncircle, m_camera,this);
+			cam1.detach();
         }
         catch (const std::exception &e)
         {
@@ -170,74 +189,117 @@ bool BaslerCamera::stopGrabbing()
     return ret;
 }
 
-bool BaslerCamera::registerImageCallBack(std::function<void(void *, const cv::Mat &)> callback, void *cb_param)
+bool BaslerCamera::getCameraInt(cameramanager::CameraInt param, int & ret_value)
 {
-    // m_image_event_handler->m_frame_callback = callback;
-    // m_image_event_handler->m_cb_param = cb_param;
-    return false;
+	bool ret = false;
+	switch (param)
+	{
+	case cameramanager::WIDTH:
+		ret_value = m_camera->Width.GetValue();
+		ret = true;
+		break;
+	case cameramanager::WIDTHMAX:
+		ret_value = m_camera->Width.GetMax();
+		ret = true;
+		break;
+	case cameramanager::HEIGHT:
+		ret_value = m_camera->Height.GetValue();
+		ret = true;
+		break;
+	case cameramanager::HEIGHTMAX:
+		ret_value = m_camera->Height.GetMax();
+		ret = true;
+		break;
+	case cameramanager::IMAGECHANNEL:
+		ret_value = 3;
+		ret = true;
+		break;
+	case cameramanager::OFFSETX:
+		ret_value = m_camera->OffsetX.GetValue();
+		ret = true;
+		break;
+	case cameramanager::OFFSETXMAX:
+		ret_value = m_camera->OffsetX.GetMax();
+		ret = true;
+		break;
+	case cameramanager::OFFSETY:
+		ret_value = m_camera->OffsetY.GetValue();
+		ret = true;
+		break;
+	case cameramanager::OFFSETYMAX:
+		ret_value = m_camera->OffsetY.GetMax();
+		ret = true;
+		break;
+	case cameramanager::FRAMES:
+		if (m_camera->IsUsb())
+		{
+			ret_value = m_camera->AcquisitionFrameRate.GetValue();
+		}
+		if (m_camera->IsGigE())
+		{
+			ret_value = m_camera->AcquisitionFrameRateAbs.GetValue();
+		}
+		ret = true;
+		break;
+	case cameramanager::FRAMESMAX:
+		if (m_camera->IsUsb())
+		{
+			ret_value =  m_camera->AcquisitionFrameRate.GetMax();
+		}
+		if (m_camera->IsGigE())
+		{
+			ret_value =  m_camera->AcquisitionFrameRateAbs.GetMax();
+		}
+		ret = true;
+		break;
+	case cameramanager::EXPOUSETIME:
+		if (m_camera->IsGigE())
+		{
+			ret_value =  m_camera->ExposureTimeAbs.GetValue();
+		}
+		if (m_camera->IsUsb())
+		{
+			ret_value =  m_camera->ExposureTime.GetValue();
+		}
+		ret = true;
+		break;
+	case cameramanager::EXPOUSETIMEMAX:
+		if (m_camera->IsGigE())
+		{
+			ret_value =  m_camera->ExposureTimeAbs.GetMax();
+		}
+		if (m_camera->IsUsb())
+		{
+			ret_value =  m_camera->ExposureTime.GetMax();
+		}
+		ret = true;
+		break;
+	case cameramanager::EXPOUSETIMEMIN:
+		if (m_camera->IsGigE())
+		{
+			ret_value =  m_camera->ExposureTimeAbs.GetMax();
+		}
+		if (m_camera->IsUsb())
+		{
+			ret_value =  m_camera->ExposureTime.GetMax();
+		}
+		ret = true;
+		break;
+	case cameramanager::CAMIMGCOUNT:
+		//ret_value = m_camera->totalcount;
+		ret = true;
+		break;
+	default:
+		break;
+	}
+	return false;
 }
 
-bool BaslerCamera::triggerOne(cv::Mat &image)
+bool BaslerCamera::setCameraInt(cameramanager::CameraInt, int)
 {
-    bool ret = false;
-    if (m_camera->IsGrabbing())
-    {
-        try
-        {
-            if (!m_extern_trigger)
-            {
-                // Execute the software trigger. Wait up to 1000 ms for the camera to be ready for trigger.
-                if (m_camera->WaitForFrameTriggerReady(1000, TimeoutHandling_ThrowException))
-                {
-                    m_camera->ExecuteSoftwareTrigger();
-                }
-                LOGD("Software trigger");
-            }
-            else
-            {
-                LOGD("Wait for extern trigger");
-            }
-
-            // Retrieve grab results and notify the camera event and image event handlers.
-            CGrabResultPtr ptrGrabResult;
-            m_camera->RetrieveResult(INFINITE, ptrGrabResult, TimeoutHandling_ThrowException);
-            // XXXXX : Nothing to do here with the grab result, the grab results are handled by the registered event
-            // handler.
-
-            // Create a target image.
-            if (ptrGrabResult.IsValid() && ptrGrabResult->GrabSucceeded())
-            {  // Create the converter and set parameters.
-                CImageFormatConverter converter;
-                converter.OutputPixelFormat = PixelType_BGR8packed;
-                // Now we can check if conversion is required.
-                if (converter.ImageHasDestinationFormat(ptrGrabResult))
-                {
-                    // No conversion is needed. It can be skipped for saving processing
-                    // time.
-                    image = cv::Mat(ptrGrabResult->GetHeight(), ptrGrabResult->GetWidth(), CV_8UC3,
-                                    ptrGrabResult->GetBuffer())
-                                .clone();
-                }
-                else
-                {
-                    CPylonImage targetImage;
-                    // Conversion is needed.
-                    converter.Convert(targetImage, ptrGrabResult);
-                    image = cv::Mat(targetImage.GetHeight(), targetImage.GetWidth(), CV_8UC3, targetImage.GetBuffer())
-                                .clone();
-                }
-
-                ret = true;
-            }
-        }
-        catch (const std::exception &e)
-        {
-            LOGE("{}", e.what());
-        }
-    }
-
-    return ret;
+	return false;
 }
+
 
 bool BaslerCamera::getExposureTime(double &us_count)
 {
@@ -311,7 +373,7 @@ bool BaslerCamera::getGain(double &gain)
         {
             break;
         }
-        gain = (float)m_camera->Gain.GetValue();
+        //gairet_value =  (float)m_camera->Gain.GetValue();
         ret = true;
     } while (0);
     return ret;
@@ -392,6 +454,20 @@ bool BaslerCamera::setTriggerDelay(const double value)
 
     return ret;
 }
+
+bool BaslerCamera::SetCallback(cameramanager::CallbackImage func, void * p)
+{
+	pUser = p;
+	callbackfunc = func;
+	return true;
+}
+bool BaslerCamera::getImage(UINT_PTR &data)
+{
+	UINT_PTR p = (UINT_PTR)(pylonBGRdata.GetBuffer());
+	data = (UINT_PTR)(p);
+	return true;
+}
+;
 
 }  // namespace smartmore
 extern "C" __declspec(dllexport) cameramanager::ICameraDevice * __stdcall CreateExportCameraObj()

@@ -1,5 +1,4 @@
 #include "icameradevice.h"
-
 // Include files to use the pylon API.
 #include <pylon/PylonIncludes.h>
 
@@ -17,6 +16,9 @@ namespace smartmore
 class  BaslerCamera:public cameramanager::ICameraDevice
 {
 public:
+	CPylonImage pylonBGRdata;
+	void* pUser = nullptr;
+	cameramanager::CallbackImage callbackfunc = nullptr;
 	BaslerCamera();
     BaslerCamera(const cameramanager::DeviceInfo &device_info);
     virtual ~BaslerCamera();
@@ -26,10 +28,11 @@ public:
     virtual bool uninitCamera();
     virtual bool openCamera();
     virtual bool closeCamera();
-    virtual bool startGrabbing(bool extern_trigger);
+    virtual bool startGrabbing();
     virtual bool stopGrabbing();
-    virtual bool registerImageCallBack(std::function<void(void *, const cv::Mat &)> callback, void *cb_param);
-    virtual bool triggerOne(cv::Mat &image);
+
+	virtual bool getCameraInt(cameramanager::CameraInt, int &);
+	virtual bool setCameraInt(cameramanager::CameraInt, int);
 
     virtual bool getExposureTime(double &us_count);
     virtual bool setExposureTime(const double us_count);
@@ -37,6 +40,10 @@ public:
     virtual bool setGain(const double gain);
     virtual bool getTriggerDelay(double &value);
     virtual bool setTriggerDelay(const double value);
+
+	virtual bool SetCallback(cameramanager::CallbackImage func, void* p);
+	virtual bool getImage(UINT_PTR&);
+
 private:
     cameramanager::DeviceInfo m_device_info;
     std::shared_ptr<CBaslerUniversalInstantCamera> m_camera;

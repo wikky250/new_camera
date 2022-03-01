@@ -1,13 +1,16 @@
-file(GLOB_RECURSE srcs *.cpp *.h, impl/*.cpp, impl/*.h)
+#file(GLOB_RECURSE srcs *.cpp *.h, impl/*.cpp, impl/*.h)
 
-add_library(balser_camera
+add_library(basler_camera
 SHARED
     ${srcs}
 )
 
-target_include_directories(balser_camera
+target_sources(basler_camera
+PUBLIC baslercamera.h
+PRIVATE baslercamera.cpp
+)
+target_include_directories(basler_camera
 PUBLIC
-    ${OpenCV_INCLUDE_DIRS}
     spdlog::spdlog
     ${PROJECT_SOURCE_DIR}/src/util
     ${PROJECT_SOURCE_DIR}/include
@@ -15,9 +18,8 @@ PUBLIC
     ${THIRDPARTY_DIR}/pylon6/include
 )
 
-target_link_libraries(balser_camera
+target_link_libraries(basler_camera
 PRIVATE
-    ${OpenCV_LIBS}
     spdlog::spdlog
     ${THIRDPARTY_DIR}/pylon6/lib/x64/GCBase_MD_VC141_v3_1_Basler_pylon.lib
     ${THIRDPARTY_DIR}/pylon6/lib/x64/GenApi_MD_VC141_v3_1_Basler_pylon.lib

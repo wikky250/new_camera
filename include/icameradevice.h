@@ -1,10 +1,11 @@
 #pragma once
 
-#include "opencv2/opencv.hpp"
 #include <condition_variable>
 #include <memory>
 #include <stdint.h>
 #include <thread>
+#include <future>
+#include <intsafe.h>
 
 
 namespace cameramanager
@@ -13,6 +14,24 @@ namespace cameramanager
 #define CameraEventLine0RisingEdge (0x01 << 1)
 #define CameraEventReadOut (0x01 << 2)
 
+enum CameraInt
+{
+	WIDTH,
+	WIDTHMAX,
+	HEIGHT,
+	HEIGHTMAX,
+	IMAGECHANNEL,
+	OFFSETX,
+	OFFSETXMAX,
+	OFFSETY,
+	OFFSETYMAX,
+	FRAMES,
+	FRAMESMAX,
+	EXPOUSETIME,
+	EXPOUSETIMEMAX,
+	EXPOUSETIMEMIN,
+	CAMIMGCOUNT
+};
 
 enum class DeviceManufacturer
 {
@@ -62,6 +81,7 @@ struct DeviceInfo
     }
 };
 
+using CallbackImage = void(*) (void*);
 class ICameraDevice
 {
 public:
@@ -72,8 +92,7 @@ public:
     //virtual bool waitForEvent(uint16_t event, int32_t timeout_millseconds) = 0;
     virtual bool openCamera() = 0;
     virtual bool isConnected() = 0;
-    virtual bool startGrabbing(bool extern_trigger = false) = 0;
-    virtual bool triggerOne(cv::Mat &image) = 0;
+    virtual bool startGrabbing() = 0;
     virtual bool stopGrabbing() = 0;
     virtual bool closeCamera() = 0;
     virtual const DeviceInfo &getDeviceInfo() = 0;
@@ -81,17 +100,25 @@ public:
     virtual bool getExposureTime(double &us_count) = 0;
     virtual bool setExposureTime(const double us_count) = 0;
 
+	virtual bool getCameraInt(CameraInt, int &) = 0;
+	virtual bool setCameraInt(CameraInt, int) = 0;
+
+
     virtual bool getGain(double &gain) = 0;
     virtual bool setGain(const double gain) = 0;
 
     virtual bool getTriggerDelay(double &value) = 0;
     virtual bool setTriggerDelay(const double value) = 0;
+	
+	virtual bool SetCallback(CallbackImage func, void * p) = 0;
+	virtual bool getImage(UINT_PTR&) = 0;
 
     //virtual bool setShaftEncoderParam(const uint32_t drop, const uint32_t multiply) = 0;
     //virtual bool getShaftEncoderParam(uint32_t &drop, uint32_t &multiply) = 0;
 
     //virtual bool setCropParam(const uint32_t top, const uint32_t left, const uint32_t width, const uint32_t height) = 0;
     //virtual bool getCropParam(uint32_t &top, uint32_t &left, uint32_t &width, uint32_t &height) = 0;
+
 };
 
 typedef ICameraDevice* (__stdcall* pExportCamera)();

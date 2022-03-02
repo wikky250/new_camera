@@ -48,6 +48,7 @@ private:
     cameramanager::DeviceInfo m_device_info;
     std::shared_ptr<CBaslerUniversalInstantCamera> m_camera;
     bool m_extern_trigger = false;
+	bool m_battach = false;
 
 };
 

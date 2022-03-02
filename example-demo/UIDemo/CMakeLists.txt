@@ -4,7 +4,7 @@ target_sources(uidemo
 INTERFACE
 	QtCameraTest.h
 	QtCameraTest.cpp
-PRIVATE
+INTERFACE
 	QtCameraTest.ui
 )
 

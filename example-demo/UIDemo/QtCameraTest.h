@@ -22,6 +22,8 @@ public:
 private:
     //camera test
     cameramanager::ICameraDevice* m_camera;
+	cv::Mat temp, temp_resize;
+	QImage Qtemp;
     //////////////////////////////////////////////////////////////////////////
 
 
@@ -29,6 +31,7 @@ private:
     QString AppPath;
     Ui::QtCameraTestClass ui;
     void InitProgram();
+
 public slots:
     void onInitCamera();
 	void onStartCamera();

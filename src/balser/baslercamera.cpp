@@ -35,7 +35,10 @@ bool BaslerCamera::initCamera(const char* cameranumber)
 {
     bool ret = false;
 
-
+	if (m_battach)
+	{
+		return false;
+	}
 
 	int exitCode = 0;
 	try
@@ -55,6 +58,7 @@ bool BaslerCamera::initCamera(const char* cameranumber)
 				continue;
             }
             m_camera = std::make_shared<CBaslerUniversalInstantCamera>(CTlFactory::GetInstance().CreateDevice(*it));
+			m_battach = true;
 		}
 	}
 	catch (const GenericException& e)
@@ -132,7 +136,7 @@ void catchIncircle(std::shared_ptr<CBaslerUniversalInstantCamera> cam,BaslerCame
 
 	CGrabResultPtr ptrGrabResult;
 	CImageFormatConverter converter;
-	converter.OutputPixelFormat = PixelType_BGR8packed;
+	converter.OutputPixelFormat = PixelType_RGB8packed;
 	while (cam->IsGrabbing())
 	{
 		// Retrieve grab results and notify the camera event and image event handlers.
@@ -140,6 +144,7 @@ void catchIncircle(std::shared_ptr<CBaslerUniversalInstantCamera> cam,BaslerCame
 		converter.OutputBitAlignment = OutputBitAlignment_MsbAligned;
 		converter.Convert(basler->pylonBGRdata, ptrGrabResult);
 		basler->callbackfunc(basler->pUser);
+		//std::this_thread::sleep_for(std::chrono::nanoseconds(1));
 		// Nothing to do here with the grab result The grab results are handled by the registered event handlers.
 	}
 }
@@ -178,6 +183,7 @@ bool BaslerCamera::stopGrabbing()
         try
         {
             m_camera->StopGrabbing();
+			m_camera->Close();
             ret = true;
         }
         catch (const std::exception &e)
@@ -461,13 +467,13 @@ bool BaslerCamera::SetCallback(cameramanager::CallbackImage func, void * p)
 	callbackfunc = func;
 	return true;
 }
+
 bool BaslerCamera::getImage(UINT_PTR &data)
 {
 	UINT_PTR p = (UINT_PTR)(pylonBGRdata.GetBuffer());
 	data = (UINT_PTR)(p);
 	return true;
 }
-;
 
 }  // namespace smartmore
 extern "C" __declspec(dllexport) cameramanager::ICameraDevice * __stdcall CreateExportCameraObj()

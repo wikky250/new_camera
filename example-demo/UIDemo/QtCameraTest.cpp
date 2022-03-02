@@ -66,23 +66,21 @@ bool QtCameraTest::GetImageFromCam()
 	if (b)
 	{
 		memcpy(m.data, (char*)p, w * h * c);
-		cv::imshow("", m);
-		cv::waitKey(1);
-	//	int zz = ui.label->frameWidth();
-	//	if (m.channels() == 3)
-	//	{
-	//		cvtColor(m, temp, CV_BGR2RGB);//BGR convert to RGB
-	//		cv::resize(temp, temp_resize, cv::Size(ui.label->size().width() - zz * 2, ui.label->size().height() - zz * 2));
-	//		Qtemp = QImage((const unsigned char*)(temp_resize.data), temp_resize.cols, temp_resize.rows, temp_resize.step, QImage::Format_RGB888);
-	//	}
-	//	else
-	//	{
-	//		cvtColor(m, temp, CV_GRAY2RGB);//GRAY convert to RGB
-	//		cv::resize(temp, temp_resize, cv::Size(ui.label->size().width() - zz * 2, ui.label->size().height() - zz * 2));
-	//		Qtemp = QImage((const unsigned char*)(temp_resize.data), temp_resize.cols, temp_resize.rows, temp_resize.step, QImage::Format_RGB888);
-	//	}
-	//	ui.label->setPixmap(QPixmap::fromImage(Qtemp));
-	//	ui.label->show();
+		int zz = ui.labelshow->frameWidth();
+		if (m.channels() == 3)
+		{
+			cv::cvtColor(m, temp, cv::COLOR_BGR2RGB);//BGR convert to RGB
+			cv::resize(m, temp_resize, cv::Size(ui.labelshow->size().width() - zz * 2, ui.labelshow->size().height() - zz * 2));
+			Qtemp = QImage((const unsigned char*)(temp_resize.data), temp_resize.cols, temp_resize.rows, temp_resize.step, QImage::Format_RGB888);
+		}
+		else
+		{
+			cv::cvtColor(m, temp, cv::COLOR_GRAY2RGB);//GRAY convert to RGB
+			cv::resize(temp, temp_resize, cv::Size(ui.labelshow->size().width() - zz * 2, ui.labelshow->size().height() - zz * 2));
+			Qtemp = QImage((const unsigned char*)(temp_resize.data), temp_resize.cols, temp_resize.rows, temp_resize.step, QImage::Format_RGB888);
+		}
+		ui.labelshow->setPixmap(QPixmap::fromImage(Qtemp));
+		ui.labelshow->show();
 	}
 	return false;
 }

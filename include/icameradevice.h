@@ -4,6 +4,7 @@
 #include <memory>
 #include <stdint.h>
 #include <thread>
+#include <chrono>
 #include <future>
 #include <intsafe.h>
 

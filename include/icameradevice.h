@@ -2,6 +2,8 @@
 
 #include <condition_variable>
 #include <memory>
+#include <string>
+#include <list>
 #include <stdint.h>
 #include <thread>
 #include <chrono>
@@ -98,18 +100,14 @@ public:
     virtual bool closeCamera() = 0;
     virtual const DeviceInfo &getDeviceInfo() = 0;
 
-    virtual bool getExposureTime(double &us_count) = 0;
-    virtual bool setExposureTime(const double us_count) = 0;
 
 	virtual bool getCameraInt(CameraInt, int &) = 0;
 	virtual bool setCameraInt(CameraInt, int) = 0;
 
+	virtual bool getCurrentTrigger(std::string) = 0;
+	virtual bool setCurrentTrigger(std::string) = 0;
 
-    virtual bool getGain(double &gain) = 0;
-    virtual bool setGain(const double gain) = 0;
-
-    virtual bool getTriggerDelay(double &value) = 0;
-    virtual bool setTriggerDelay(const double value) = 0;
+	virtual bool getTriggerList(std::list<std::string>& list) = 0;
 	
 	virtual bool SetCallback(CallbackImage func, void * p) = 0;
 	virtual bool getImage(UINT_PTR&) = 0;

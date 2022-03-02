@@ -5,6 +5,7 @@
 #include <QDir>
 #include <QThread>
 #include <QImage>
+#include <QHeaderView>
 #include "ui_QtCameraTest.h"
 #include "icameradevice.h"
 #include <intsafe.h>
@@ -18,10 +19,11 @@ public:
     QtCameraTest(QWidget *parent = Q_NULLPTR);
 
 
+
 	bool GetImageFromCam();
 private:
     //camera test
-    cameramanager::ICameraDevice* m_camera;
+    cameramanager::ICameraDevice* m_camera= nullptr;
 	cv::Mat temp, temp_resize;
 	QImage Qtemp;
     //////////////////////////////////////////////////////////////////////////
@@ -30,10 +32,16 @@ private:
 
     QString AppPath;
     Ui::QtCameraTestClass ui;
-    void InitProgram();
+    void initProgram();
+	void initCameraParamList();
+	void fillCamParamValue();
 
+	//table button and slider
+	QPushButton *btn;
+	///////////
 public slots:
     void onInitCamera();
 	void onStartCamera();
 	void onStopCamera();
+	void closeEvent(QCloseEvent *event); 
 };

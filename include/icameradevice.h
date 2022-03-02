@@ -91,13 +91,8 @@ public:
     virtual ~ICameraDevice() {}
 
     virtual bool initCamera(const char*) = 0;
-    //virtual bool registerEvent(uint16_t event) = 0;
-    //virtual bool waitForEvent(uint16_t event, int32_t timeout_millseconds) = 0;
-    virtual bool openCamera() = 0;
-    virtual bool isConnected() = 0;
     virtual bool startGrabbing() = 0;
     virtual bool stopGrabbing() = 0;
-    virtual bool closeCamera() = 0;
     virtual const DeviceInfo &getDeviceInfo() = 0;
 
 

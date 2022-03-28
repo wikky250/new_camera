@@ -338,12 +338,62 @@ bool BaslerCamera::getCameraInt(cameramanager::CameraInt param, int & ret_value)
 	return false;
 }
 
-bool BaslerCamera::setCameraInt(cameramanager::CameraInt, int)
+bool BaslerCamera::setCameraInt(cameramanager::CameraInt param, int value)
 {
-	return false;
+	try
+	{
+		switch (param)
+		{
+		case cameramanager::WIDTH:
+			m_camera->Width.SetValue(value);
+			break;
+		case cameramanager::HEIGHT:
+			m_camera->Height.SetValue(value);
+			break;
+		case cameramanager::OFFSETX:
+			m_camera->OffsetX.SetValue(value);
+			break;
+		case cameramanager::OFFSETY:
+			m_camera->OffsetY.SetValue(value);
+			break;
+		case cameramanager::FRAMES:
+		{
+			if (m_camera->IsUsb())
+			{
+				m_camera->AcquisitionFrameRate.SetValue(value);
+			}
+			if (m_camera->IsGigE())
+			{
+				m_camera->AcquisitionFrameRateAbs.SetValue(value);
+			}
+			break;
+		}
+		case cameramanager::EXPOUSETIME:
+		{
+			if (m_camera->IsGigE())
+			{
+				m_camera->ExposureTimeAbs.SetValue(value);
+			}
+			if (m_camera->IsUsb())
+			{
+				m_camera->ExposureTime.SetValue(value);
+			}
+			break;
+		}
+		case cameramanager::CAMIMGCOUNT:
+			break;
+		default:
+			break;
+		}
+		return true;
+	}
+	catch (...)
+	{
+		return false;
+	}
 }
 
-bool BaslerCamera::getCurrentTrigger(std::string str)
+bool BaslerCamera::getCurrentTrigger(std::string &str)
 {
 	try
 	{

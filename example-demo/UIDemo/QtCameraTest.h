@@ -24,6 +24,7 @@ public:
 private:
     //camera test
     cameramanager::ICameraDevice* m_camera= nullptr;
+	QComboBox* cb_triggerSource = nullptr;
 	cv::Mat temp, temp_resize;
 	QImage Qtemp;
     //////////////////////////////////////////////////////////////////////////
@@ -47,4 +48,12 @@ public slots:
 	void closeEvent(QCloseEvent *event);
 	void onCheckBoxtoSelectSavePath(bool);
 	void onCreateNewFolder();
+	void onCameraCellChange(int, int);
+	void onslotChangeTriggerSource(QString trigger) {
+		if ("NONE" != trigger)
+			ui.tW_detail->setRowHeight(1, 0);
+		else
+		{
+			ui.tW_detail->setRowHeight(1, ui.tW_detail->rowHeight(2));
+		} };
 };

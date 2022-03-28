@@ -7,9 +7,9 @@
 #include <future> 
 using namespace std;
 QtCameraTest::QtCameraTest(QWidget *parent)
-    : QMainWindow(parent)
+	: QMainWindow(parent)
 {
-    ui.setupUi(this);
+	ui.setupUi(this);
 	AppPath = qApp->applicationDirPath();//exe所在目录
 
 	initProgram();
@@ -19,6 +19,7 @@ QtCameraTest::QtCameraTest(QWidget *parent)
 	QObject::connect(ui.pB_stop, SIGNAL(clicked()), this, SLOT(onStopCamera()));
 	QObject::connect(ui.cB_recode, SIGNAL(toggled(bool)), this, SLOT(onCheckBoxtoSelectSavePath(bool)));
 	QObject::connect(ui.pB_NF, SIGNAL(clicked()), this, SLOT(onCreateNewFolder()));
+	QObject::connect(ui.tW_detail, SIGNAL(clicked()), this, SLOT(onCreateNewFolder()));
 }
 
 void QtCameraTest::initProgram()
@@ -29,7 +30,7 @@ void QtCameraTest::initProgram()
 	{
 		return;
 	}
-	QFileInfoList list = finder.entryInfoList(); 
+	QFileInfoList list = finder.entryInfoList();
 	QStringList filelist = finder.entryList();
 	QStringList newnames = filelist.filter("camera.dll");
 	if (newnames.size() > 0)
@@ -46,11 +47,13 @@ void QtCameraTest::initCameraParamList()
 	ui.tW_detail->setColumnCount(2);
 	ui.tW_detail->setHorizontalHeaderLabels(st);
 	ui.tW_detail->verticalHeader()->setHidden(true);
+	ui.tW_detail->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	ui.tW_detail->horizontalHeader()->setHidden(false);
-	//ui.tW_detail->setColumnWidth(0, 300);
-	ui.tW_detail->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+	ui.tW_detail->setColumnWidth(0, 200);
 	ui.tW_detail->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
 	ui.tW_detail->horizontalHeader()->setHighlightSections(false);
+	QObject::connect(ui.tW_detail, SIGNAL(cellChanged(int, int)), this, SLOT(onCameraCellChange(int, int)));
+
 }
 
 void QtCameraTest::fillCamParamValue()
@@ -71,12 +74,12 @@ void QtCameraTest::fillCamParamValue()
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsSelectable));
 		std::list<std::string> ls_str;
 		m_camera->getTriggerList(ls_str);
-		if (ls_str.size()!=0)
+		if (ls_str.size() != 0)
 		{
-			QComboBox* cb_triggerSource = new QComboBox;
+			cb_triggerSource = new QComboBox(this);
 			cb_triggerSource->setMaxCount(8);
 			cb_triggerSource->addItem("NONE");
-			for (std::list<std::string>::iterator it = ls_str.begin(); it != ls_str.end();++it)
+			for (std::list<std::string>::iterator it = ls_str.begin(); it != ls_str.end(); ++it)
 			{
 				cb_triggerSource->addItem(QString::fromStdString(*it));
 			}
@@ -85,10 +88,12 @@ void QtCameraTest::fillCamParamValue()
 				QString str = cb_triggerSource->currentText();
 				m_camera->setCurrentTrigger(str.toStdString());
 			});
+			bool b = connect(cb_triggerSource, &QComboBox::textActivated, this, &QtCameraTest::onslotChangeTriggerSource);
 			std::string cur;
 			m_camera->getCurrentTrigger(cur);
 			cb_triggerSource->setCurrentText(QString::fromStdString(cur));
 			ui.tW_detail->setCellWidget(currentcolumn, 1, cb_triggerSource);
+
 		}
 		else
 		{
@@ -99,8 +104,7 @@ void QtCameraTest::fillCamParamValue()
 
 		currentcolumn = ui.tW_detail->rowCount();
 		ui.tW_detail->insertRow(currentcolumn);
-
-		QString sts = QString::fromLocal8Bit("帧率");
+		QString sts = QString::fromLocal8Bit("帧率_");
 		ui.tW_detail->setItem(currentcolumn, 0, new QTableWidgetItem(sts));
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsEditable));
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsSelectable));
@@ -131,7 +135,9 @@ void QtCameraTest::fillCamParamValue()
 		//	}
 		//});
 
-		if (0 != value)
+		std::string cur;
+		m_camera->getCurrentTrigger(cur);
+		if ("NONE" != cur)
 		{
 			ui.tW_detail->setRowHeight(currentcolumn, 0);
 		}
@@ -140,7 +146,7 @@ void QtCameraTest::fillCamParamValue()
 		currentcolumn = ui.tW_detail->rowCount();
 		ui.tW_detail->insertRow(currentcolumn);
 		m_camera->getCameraInt(cameramanager::WIDTHMAX, w);
-		sts = QString::fromLocal8Bit("ROI宽度") + QString::number(w);
+		sts = QString::fromLocal8Bit("宽度_") + QString::number(w);
 		ui.tW_detail->setItem(currentcolumn, 0, new QTableWidgetItem(sts));
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsEditable));
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsSelectable));
@@ -151,7 +157,7 @@ void QtCameraTest::fillCamParamValue()
 		currentcolumn = ui.tW_detail->rowCount();
 		ui.tW_detail->insertRow(currentcolumn);
 		m_camera->getCameraInt(cameramanager::HEIGHTMAX, h);
-		//sts = QString::fromLocal8Bit("ROI高度") + QString::number(h);
+		sts = QString::fromLocal8Bit("高度_") + QString::number(h);
 		ui.tW_detail->setItem(currentcolumn, 0, new QTableWidgetItem(sts));
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsEditable));
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsSelectable));
@@ -161,7 +167,7 @@ void QtCameraTest::fillCamParamValue()
 		currentcolumn = ui.tW_detail->rowCount();
 		ui.tW_detail->insertRow(currentcolumn);
 		m_camera->getCameraInt(cameramanager::OFFSETXMAX, x);
-		sts = QString::fromLocal8Bit("X偏移量") + QString::number(x);
+		sts = QString::fromLocal8Bit("X偏移量_") + QString::number(x);
 		ui.tW_detail->setItem(currentcolumn, 0, new QTableWidgetItem(sts));
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsEditable));
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsSelectable));
@@ -171,7 +177,7 @@ void QtCameraTest::fillCamParamValue()
 		currentcolumn = ui.tW_detail->rowCount();
 		ui.tW_detail->insertRow(currentcolumn);
 		m_camera->getCameraInt(cameramanager::OFFSETYMAX, y);
-		sts = QString::fromLocal8Bit("Y偏移量") + QString::number(y);
+		sts = QString::fromLocal8Bit("Y偏移量_") + QString::number(y);
 		ui.tW_detail->setItem(currentcolumn, 0, new QTableWidgetItem(sts));
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsEditable));
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsSelectable));
@@ -325,8 +331,8 @@ bool QtCameraTest::GetImageFromCam()
 		if (m_bSaving)
 		{
 			QDateTime ti = QDateTime::currentDateTime();
-			QString path = m_sSavePath + "/"+ ti.toString("HH_mm_ss_zzz")+".bmp";
-			async(launch::async, [](cv::Mat img,std::string path) {
+			QString path = m_sSavePath + "/" + ti.toString("HH_mm_ss_zzz") + ".bmp";
+			async(launch::async, [](cv::Mat img, std::string path) {
 				cv::imwrite(path, img);
 			}, m, path.toStdString());
 		}
@@ -339,13 +345,19 @@ bool QtCameraTest::GetImageFromCam()
 void QtCameraTest::onStartCamera()
 {
 	if (m_camera)
-		m_camera->startGrabbing();
+	{
+		m_camera->startGrabbing(); 
+		ui.tW_detail->setEnabled(false);
+	}
 }
 
 void QtCameraTest::onStopCamera()
 {
 	if (m_camera)
+	{
 		m_camera->stopGrabbing();
+		ui.tW_detail->setEnabled(true);
+	}
 }
 
 void QtCameraTest::closeEvent(QCloseEvent * event)
@@ -394,4 +406,83 @@ void QtCameraTest::onCreateNewFolder()
 	{
 		createMultipleFolders(m_sSavePath);
 	}
+}
+
+void QtCameraTest::onCameraCellChange(int r, int c)
+{
+	((QTableWidget*)sender())->blockSignals(true);
+	switch (r)
+	{
+	case 2:
+	{
+		int values = ((QTableWidget*)sender())->item(r, c)->text().toInt();
+		if (m_camera)
+			m_camera->stopGrabbing();
+		m_camera->setCameraInt(cameramanager::WIDTH, values);
+
+		m_camera->getCameraInt(cameramanager::WIDTH, values);
+		((QTableWidget*)sender())->item(r, c)->setText(QString::number(values));
+		m_camera->getCameraInt(cameramanager::WIDTHMAX, values);
+		QString sts = QString::fromLocal8Bit("宽度_") + QString::number(values);
+		((QTableWidget*)sender())->item(r, 0)->setText(sts);
+		m_camera->getCameraInt(cameramanager::OFFSETXMAX, values);
+		sts = QString::fromLocal8Bit("X偏移量_") + QString::number(values);
+		((QTableWidget*)sender())->item(r + 2, 0)->setText(sts);
+		break;
+	}
+	case 3:
+	{
+		int values = ((QTableWidget*)sender())->item(r, c)->text().toInt();
+		if (m_camera)
+			m_camera->stopGrabbing();
+		m_camera->setCameraInt(cameramanager::HEIGHT, values);
+		m_camera->getCameraInt(cameramanager::HEIGHT, values);
+		((QTableWidget*)sender())->item(r, c)->setText(QString::number(values));
+		m_camera->getCameraInt(cameramanager::HEIGHTMAX, values);
+		QString sts = QString::fromLocal8Bit("高度_") + QString::number(values);
+		((QTableWidget*)sender())->item(r, 0)->setText(sts);
+		m_camera->getCameraInt(cameramanager::OFFSETYMAX, values);
+		sts = QString::fromLocal8Bit("Y偏移量_") + QString::number(values);
+		((QTableWidget*)sender())->item(r + 2, 0)->setText(sts);
+		break;
+	}
+	case 4:
+	{
+		int values = ((QTableWidget*)sender())->item(r, c)->text().toInt();
+		if (m_camera)
+			m_camera->stopGrabbing();
+		m_camera->setCameraInt(cameramanager::OFFSETX, values);
+
+		m_camera->getCameraInt(cameramanager::OFFSETX, values);
+		((QTableWidget*)sender())->item(r, c)->setText(QString::number(values));
+		m_camera->getCameraInt(cameramanager::OFFSETXMAX, values);
+		QString sts = QString::fromLocal8Bit("X偏移量_") + QString::number(values);
+		((QTableWidget*)sender())->item(r, 0)->setText(sts);
+		m_camera->getCameraInt(cameramanager::WIDTHMAX, values);
+		sts = QString::fromLocal8Bit("宽度_") + QString::number(values);
+		((QTableWidget*)sender())->item(r - 2, 0)->setText(sts);
+		break;
+	}
+	case 5:
+	{
+		int values = ((QTableWidget*)sender())->item(r, c)->text().toInt();
+		int valueBefore = values;
+		if (m_camera)
+			m_camera->stopGrabbing();
+		m_camera->setCameraInt(cameramanager::OFFSETY, values);
+		m_camera->getCameraInt(cameramanager::OFFSETY, values);
+		((QTableWidget*)sender())->item(r, c)->setText(QString::number(values));
+		m_camera->getCameraInt(cameramanager::OFFSETYMAX, values);
+		QString sts = QString::fromLocal8Bit("Y偏移量_") + QString::number(values);
+		((QTableWidget*)sender())->item(r, 0)->setText(sts);
+		m_camera->getCameraInt(cameramanager::HEIGHTMAX, values);
+		sts = QString::fromLocal8Bit("高度_") + QString::number(values);
+		((QTableWidget*)sender())->item(r - 2, 0)->setText(sts);
+
+		break;
+	}
+	default:
+		break;
+	}
+	((QTableWidget*)sender())->blockSignals(false);
 }

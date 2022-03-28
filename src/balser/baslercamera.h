@@ -34,7 +34,7 @@ public:
 	virtual bool getCameraInt(cameramanager::CameraInt, int &);
 	virtual bool setCameraInt(cameramanager::CameraInt, int);
 
-	virtual bool getCurrentTrigger(std::string str);
+	virtual bool getCurrentTrigger(std::string &str);
 	virtual bool setCurrentTrigger(std::string str);
 
 	virtual bool getTriggerList(std::list<std::string>& list);

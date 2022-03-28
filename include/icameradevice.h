@@ -99,7 +99,7 @@ public:
 	virtual bool getCameraInt(CameraInt, int &) = 0;
 	virtual bool setCameraInt(CameraInt, int) = 0;
 
-	virtual bool getCurrentTrigger(std::string) = 0;
+	virtual bool getCurrentTrigger(std::string&) = 0;
 	virtual bool setCurrentTrigger(std::string) = 0;
 
 	virtual bool getTriggerList(std::list<std::string>& list) = 0;

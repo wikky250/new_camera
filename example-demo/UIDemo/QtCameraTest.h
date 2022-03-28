@@ -27,14 +27,15 @@ private:
 	cv::Mat temp, temp_resize;
 	QImage Qtemp;
     //////////////////////////////////////////////////////////////////////////
-
-
+	QString m_sSavePath;
+	bool m_bSaving = false;
 
     QString AppPath;
     Ui::QtCameraTestClass ui;
     void initProgram();
 	void initCameraParamList();
 	void fillCamParamValue();
+	
 
 	//table button and slider
 	QPushButton *btn;
@@ -43,5 +44,7 @@ public slots:
     void onInitCamera();
 	void onStartCamera();
 	void onStopCamera();
-	void closeEvent(QCloseEvent *event); 
+	void closeEvent(QCloseEvent *event);
+	void onCheckBoxtoSelectSavePath(bool);
+	void onCreateNewFolder();
 };

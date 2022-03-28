@@ -2,7 +2,10 @@
 
 
 #include "logger.h"
-using namespace cameramanager;
+#include <QDir>
+#include <QDateTime>
+#include <future> 
+using namespace std;
 QtCameraTest::QtCameraTest(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -14,6 +17,8 @@ QtCameraTest::QtCameraTest(QWidget *parent)
 	QObject::connect(ui.pB_init, SIGNAL(clicked()), this, SLOT(onInitCamera()));
 	QObject::connect(ui.pB_start, SIGNAL(clicked()), this, SLOT(onStartCamera()));
 	QObject::connect(ui.pB_stop, SIGNAL(clicked()), this, SLOT(onStopCamera()));
+	QObject::connect(ui.cB_recode, SIGNAL(toggled(bool)), this, SLOT(onCheckBoxtoSelectSavePath(bool)));
+	QObject::connect(ui.pB_NF, SIGNAL(clicked()), this, SLOT(onCreateNewFolder()));
 }
 
 void QtCameraTest::initProgram()
@@ -99,7 +104,7 @@ void QtCameraTest::fillCamParamValue()
 		ui.tW_detail->setItem(currentcolumn, 0, new QTableWidgetItem(sts));
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsEditable));
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsSelectable));
-		m_camera->getCameraInt(FRAMES, value);
+		m_camera->getCameraInt(cameramanager::FRAMES, value);
 		ui.tW_detail->setItem(currentcolumn, 1, new QTableWidgetItem(QString::number(value)));
 
 		//value = -1;
@@ -134,43 +139,43 @@ void QtCameraTest::fillCamParamValue()
 		int w = 0, h = 0, x = 0, y = 0;
 		currentcolumn = ui.tW_detail->rowCount();
 		ui.tW_detail->insertRow(currentcolumn);
-		m_camera->getCameraInt(WIDTHMAX, w);
+		m_camera->getCameraInt(cameramanager::WIDTHMAX, w);
 		sts = QString::fromLocal8Bit("ROI宽度") + QString::number(w);
 		ui.tW_detail->setItem(currentcolumn, 0, new QTableWidgetItem(sts));
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsEditable));
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsSelectable));
 
-		m_camera->getCameraInt(WIDTH, w);
+		m_camera->getCameraInt(cameramanager::WIDTH, w);
 		ui.tW_detail->setItem(currentcolumn, 1, new QTableWidgetItem(QString::number(w)));
 
 		currentcolumn = ui.tW_detail->rowCount();
 		ui.tW_detail->insertRow(currentcolumn);
-		m_camera->getCameraInt(HEIGHTMAX, h);
+		m_camera->getCameraInt(cameramanager::HEIGHTMAX, h);
 		//sts = QString::fromLocal8Bit("ROI高度") + QString::number(h);
 		ui.tW_detail->setItem(currentcolumn, 0, new QTableWidgetItem(sts));
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsEditable));
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsSelectable));
-		m_camera->getCameraInt(HEIGHT, h);
+		m_camera->getCameraInt(cameramanager::HEIGHT, h);
 		ui.tW_detail->setItem(currentcolumn, 1, new QTableWidgetItem(QString::number(h)));
 
 		currentcolumn = ui.tW_detail->rowCount();
 		ui.tW_detail->insertRow(currentcolumn);
-		m_camera->getCameraInt(OFFSETXMAX, x);
+		m_camera->getCameraInt(cameramanager::OFFSETXMAX, x);
 		sts = QString::fromLocal8Bit("X偏移量") + QString::number(x);
 		ui.tW_detail->setItem(currentcolumn, 0, new QTableWidgetItem(sts));
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsEditable));
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsSelectable));
-		m_camera->getCameraInt(OFFSETX, x);
+		m_camera->getCameraInt(cameramanager::OFFSETX, x);
 		ui.tW_detail->setItem(currentcolumn, 1, new QTableWidgetItem(QString::number(x)));
 
 		currentcolumn = ui.tW_detail->rowCount();
 		ui.tW_detail->insertRow(currentcolumn);
-		m_camera->getCameraInt(OFFSETYMAX, y);
+		m_camera->getCameraInt(cameramanager::OFFSETYMAX, y);
 		sts = QString::fromLocal8Bit("Y偏移量") + QString::number(y);
 		ui.tW_detail->setItem(currentcolumn, 0, new QTableWidgetItem(sts));
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsEditable));
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsSelectable));
-		m_camera->getCameraInt(OFFSETY, y);
+		m_camera->getCameraInt(cameramanager::OFFSETY, y);
 		ui.tW_detail->setItem(currentcolumn, 1, new QTableWidgetItem(QString::number(y)));
 
 		//currentcolumn = ui.tW_detail->rowCount();
@@ -243,7 +248,7 @@ void QtCameraTest::fillCamParamValue()
 		ui.tW_detail->setItem(currentcolumn, 0, new QTableWidgetItem(QString::fromLocal8Bit("曝光时长")));
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsEditable));
 		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsSelectable));
-		m_camera->getCameraInt(EXPOUSETIME, value);
+		m_camera->getCameraInt(cameramanager::EXPOUSETIME, value);
 		ui.tW_detail->setItem(currentcolumn, 1, new QTableWidgetItem(QString::number(value)));
 
 		currentcolumn = ui.tW_detail->rowCount();
@@ -275,7 +280,7 @@ void QtCameraTest::onInitCamera()
 {
 	//should add 
 	QLibrary* LocalFileDLL = new QLibrary(qApp->applicationDirPath() + "/" + ui.comboBox_HaveDll->currentText());
-	pExportCamera CreateLocalCamera = (pExportCamera)(LocalFileDLL->resolve("CreateExportCameraObj"));//导出类
+	cameramanager::pExportCamera CreateLocalCamera = (cameramanager::pExportCamera)(LocalFileDLL->resolve("CreateExportCameraObj"));//导出类
 	if (m_camera != nullptr)
 		delete m_camera;
 	m_camera = CreateLocalCamera();
@@ -290,9 +295,9 @@ void QtCameraTest::onInitCamera()
 bool QtCameraTest::GetImageFromCam()
 {
 	int w, h, c;
-	m_camera->getCameraInt(WIDTH, w);
-	m_camera->getCameraInt(HEIGHT, h);
-	m_camera->getCameraInt(IMAGECHANNEL, c);
+	m_camera->getCameraInt(cameramanager::WIDTH, w);
+	m_camera->getCameraInt(cameramanager::HEIGHT, h);
+	m_camera->getCameraInt(cameramanager::IMAGECHANNEL, c);
 	if (-1 == w || -1 == h || c == -1)
 	{
 		return false;
@@ -316,6 +321,14 @@ bool QtCameraTest::GetImageFromCam()
 			cv::cvtColor(m, temp, cv::COLOR_GRAY2RGB);//GRAY convert to RGB
 			cv::resize(temp, temp_resize, cv::Size(ui.labelshow->size().width() - zz * 2, ui.labelshow->size().height() - zz * 2));
 			Qtemp = QImage((const unsigned char*)(temp_resize.data), temp_resize.cols, temp_resize.rows, temp_resize.step, QImage::Format_RGB888);
+		}
+		if (m_bSaving)
+		{
+			QDateTime ti = QDateTime::currentDateTime();
+			QString path = m_sSavePath + "/"+ ti.toString("HH_mm_ss_zzz")+".bmp";
+			async(launch::async, [](cv::Mat img,std::string path) {
+				cv::imwrite(path, img);
+			}, m, path.toStdString());
 		}
 		ui.labelshow->setPixmap(QPixmap::fromImage(Qtemp));
 		ui.labelshow->show();
@@ -341,5 +354,44 @@ void QtCameraTest::closeEvent(QCloseEvent * event)
 	{
 		delete m_camera;
 		m_camera = nullptr;
+	}
+}
+QString createMultipleFolders(const QString path)
+{
+	QDir dir(path);
+	if (dir.exists(path)) {
+		return path;
+	}
+
+	QString parentDir = createMultipleFolders(path.mid(0, path.lastIndexOf('/')));
+	QString dirName = path.mid(path.lastIndexOf('/') + 1);
+	QDir parentPath(parentDir);
+	if (!dirName.isEmpty())
+	{
+		parentPath.mkpath(dirName);
+	}
+	return parentDir + "/" + dirName;
+}
+void QtCameraTest::onCheckBoxtoSelectSavePath(bool b)
+{
+	if (b)
+	{
+		onCreateNewFolder();
+		m_bSaving = true;
+	}
+	else
+	{
+		m_bSaving = false;
+	}
+}
+
+void QtCameraTest::onCreateNewFolder()
+{
+	QString path = qApp->applicationDirPath() + "/savepath";
+	m_sSavePath = path + QDateTime::currentDateTime().toString("/yyyy_MM_dd_HH_mm_ss") + "/";
+	QDir dir(m_sSavePath);
+	if (!dir.exists())
+	{
+		createMultipleFolders(m_sSavePath);
 	}
 }

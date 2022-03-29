@@ -61,27 +61,13 @@ enum class TransLayerType
 struct DeviceInfo
 {
     std::string model_name;
-    std::string serial_number;
-    DeviceManufacturer device_type;
-    TransLayerType layer_type;
-    std::string full_name;
-
-    // Dalsa板卡信息
-    int board_server_index = -1;
-    std::string board_server_name;
-    int board_resouce_index = -1;
-    std::string board_resouce_name;
-
-    // Dalsa相机信息
-    int camera_server_index = -1;
-    std::string camera_server_name;
-    int camera_resource_index = -1;
-    std::string camera_resouce_name;
-
-    std::string getCameraId() const
-    {
-        return model_name + "_" + serial_number;
-    }
+	int width;
+	int height;
+	int channel;
+	int offsetx;
+	int offsety;
+	int frames;
+	int expousetime;
 };
 
 using CallbackImage = void(*) (void*);

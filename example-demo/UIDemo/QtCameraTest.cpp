@@ -5,12 +5,14 @@
 #include <QDir>
 #include <QDateTime>
 #include <future> 
+#include <QSettings>
 using namespace std;
 QtCameraTest::QtCameraTest(QWidget *parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
 	AppPath = qApp->applicationDirPath();//exe所在目录
+	readParam();
 
 	initProgram();
 	initCameraParamList();
@@ -277,6 +279,39 @@ void QtCameraTest::fillCamParamValue()
 	ui.tW_detail->blockSignals(false);
 }
 
+void QtCameraTest::readParam()
+{
+	QSettings setting(AppPath + "/setting.ini", QSettings::IniFormat);
+	setting.setIniCodec("utf-8");
+
+	QString st = setting.value("CAMERASET/SERIALNUMBER", "-1").toString();
+	if ("-1" != st)
+	{
+		ui.textEdit_sn->setText(st);
+	}
+	di.width = setting.value("CAMERASET/WIDTH", 1280).toInt();
+	di.height = setting.value("CAMERASET/HEIGHT", 1024).toInt();
+	di.offsetx = setting.value("CAMERASET/OFFSETX", 0).toInt();
+	di.offsety = setting.value("CAMERASET/OFFSETY", 0).toInt();
+	di.frames = setting.value("CAMERASET/FRAMES", 5).toInt();
+	di.expousetime = setting.value("CAMERASET/EXPOUSETIME", 5000).toInt();
+}
+
+void QtCameraTest::saveParam()
+{
+	QSettings setting(AppPath + "/setting.ini", QSettings::IniFormat);
+	setting.setIniCodec("utf-8");
+
+	setting.setValue("CAMERASET/SERIALNUMBER", ui.textEdit_sn->toPlainText());
+
+	setting.setValue("CAMERASET/WIDTH", di.width);
+	setting.setValue("CAMERASET/HEIGHT", di.height);
+	setting.setValue("CAMERASET/OFFSETX", di.offsetx);
+	setting.setValue("CAMERASET/OFFSETY", di.offsety);
+	setting.setValue("CAMERASET/FRAMES", di.frames);
+	setting.setValue("CAMERASET/EXPOUSETIME", di.expousetime);
+}
+
 void CallbackGetImg(void* puser)
 {
 	((QtCameraTest*)puser)->GetImageFromCam();
@@ -290,10 +325,19 @@ void QtCameraTest::onInitCamera()
 	if (m_camera != nullptr)
 		delete m_camera;
 	m_camera = CreateLocalCamera();
-	m_camera->initCamera(ui.textEdit_sn->toPlainText().toLocal8Bit());
-	m_camera->SetCallback(CallbackGetImg, this);
+	if (m_camera->initCamera(ui.textEdit_sn->toPlainText().toLocal8Bit()))
+	{
+		m_camera->SetCallback(CallbackGetImg, this);
+		m_camera->setCameraInt(cameramanager::WIDTH, di.width);
+		m_camera->setCameraInt(cameramanager::HEIGHT, di.height);
+		m_camera->setCameraInt(cameramanager::OFFSETX, di.offsetx);
+		m_camera->setCameraInt(cameramanager::OFFSETY, di.offsety);
+		m_camera->setCameraInt(cameramanager::FRAMES, di.frames);
+		m_camera->setCameraInt(cameramanager::EXPOUSETIME, di.expousetime);
 
-	fillCamParamValue();
+
+		fillCamParamValue();
+	}
 
 
 
@@ -362,6 +406,7 @@ void QtCameraTest::onStopCamera()
 
 void QtCameraTest::closeEvent(QCloseEvent * event)
 {
+	saveParam();
 	if (m_camera)
 	{
 		delete m_camera;
@@ -419,8 +464,8 @@ void QtCameraTest::onCameraCellChange(int r, int c)
 		if (m_camera)
 			m_camera->stopGrabbing();
 		m_camera->setCameraInt(cameramanager::WIDTH, values);
-
 		m_camera->getCameraInt(cameramanager::WIDTH, values);
+		di.width = values;
 		((QTableWidget*)sender())->item(r, c)->setText(QString::number(values));
 		m_camera->getCameraInt(cameramanager::WIDTHMAX, values);
 		QString sts = QString::fromLocal8Bit("宽度_") + QString::number(values);
@@ -428,6 +473,7 @@ void QtCameraTest::onCameraCellChange(int r, int c)
 		m_camera->getCameraInt(cameramanager::OFFSETXMAX, values);
 		sts = QString::fromLocal8Bit("X偏移量_") + QString::number(values);
 		((QTableWidget*)sender())->item(r + 2, 0)->setText(sts);
+
 		break;
 	}
 	case 3:
@@ -437,6 +483,7 @@ void QtCameraTest::onCameraCellChange(int r, int c)
 			m_camera->stopGrabbing();
 		m_camera->setCameraInt(cameramanager::HEIGHT, values);
 		m_camera->getCameraInt(cameramanager::HEIGHT, values);
+		di.height = values;
 		((QTableWidget*)sender())->item(r, c)->setText(QString::number(values));
 		m_camera->getCameraInt(cameramanager::HEIGHTMAX, values);
 		QString sts = QString::fromLocal8Bit("高度_") + QString::number(values);
@@ -452,8 +499,8 @@ void QtCameraTest::onCameraCellChange(int r, int c)
 		if (m_camera)
 			m_camera->stopGrabbing();
 		m_camera->setCameraInt(cameramanager::OFFSETX, values);
-
 		m_camera->getCameraInt(cameramanager::OFFSETX, values);
+		di.offsetx = values;
 		((QTableWidget*)sender())->item(r, c)->setText(QString::number(values));
 		m_camera->getCameraInt(cameramanager::OFFSETXMAX, values);
 		QString sts = QString::fromLocal8Bit("X偏移量_") + QString::number(values);
@@ -471,6 +518,7 @@ void QtCameraTest::onCameraCellChange(int r, int c)
 			m_camera->stopGrabbing();
 		m_camera->setCameraInt(cameramanager::OFFSETY, values);
 		m_camera->getCameraInt(cameramanager::OFFSETY, values);
+		di.offsety = values;
 		((QTableWidget*)sender())->item(r, c)->setText(QString::number(values));
 		m_camera->getCameraInt(cameramanager::OFFSETYMAX, values);
 		QString sts = QString::fromLocal8Bit("Y偏移量_") + QString::number(values);

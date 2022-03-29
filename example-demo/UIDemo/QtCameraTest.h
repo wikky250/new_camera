@@ -23,6 +23,7 @@ public:
 	bool GetImageFromCam();
 private:
     //camera test
+	cameramanager::DeviceInfo di;
     cameramanager::ICameraDevice* m_camera= nullptr;
 	QComboBox* cb_triggerSource = nullptr;
 	cv::Mat temp, temp_resize;
@@ -37,6 +38,8 @@ private:
 	void initCameraParamList();
 	void fillCamParamValue();
 	
+	void readParam();
+	void saveParam();
 
 	//table button and slider
 	QPushButton *btn;

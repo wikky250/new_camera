@@ -52,11 +52,5 @@ public slots:
 	void onCheckBoxtoSelectSavePath(bool);
 	void onCreateNewFolder();
 	void onCameraCellChange(int, int);
-	void onslotChangeTriggerSource(QString trigger) {
-		if ("NONE" != trigger)
-			ui.tW_detail->setRowHeight(1, 0);
-		else
-		{
-			ui.tW_detail->setRowHeight(1, ui.tW_detail->rowHeight(2));
-		} };
+	void onslotChangeTriggerSource(QString trigger); 
 };

@@ -36,8 +36,11 @@ public:
 
 	virtual bool getCurrentTrigger(std::string &str);
 	virtual bool setCurrentTrigger(std::string str);
-
 	virtual bool getTriggerList(std::list<std::string>& list);
+
+	virtual bool getCurrentFormat(std::string &str);
+	virtual bool setCurrentFormat(std::string str);
+	virtual bool getFormatList(std::list<std::string>& list);
 
 
 	virtual bool SetCallback(cameramanager::CallbackImage func, void* p);

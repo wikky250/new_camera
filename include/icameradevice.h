@@ -87,8 +87,11 @@ public:
 
 	virtual bool getCurrentTrigger(std::string&) = 0;
 	virtual bool setCurrentTrigger(std::string) = 0;
-
 	virtual bool getTriggerList(std::list<std::string>& list) = 0;
+
+	virtual bool getCurrentFormat(std::string &str) = 0;
+	virtual bool setCurrentFormat(std::string str) = 0;
+	virtual bool getFormatList(std::list<std::string>& list) = 0;
 	
 	virtual bool SetCallback(CallbackImage func, void * p) = 0;
 	virtual bool getImage(UINT_PTR&) = 0;

@@ -113,37 +113,32 @@ void QtCameraTest::fillCamParamValue()
 		m_camera->getCameraInt(cameramanager::FRAMES, value);
 		ui.tW_detail->setItem(currentcolumn, 1, new QTableWidgetItem(QString::number(value)));
 
-		//value = -1;
-		//QString localfile;
-		//m_camera->GetTypeOfCamera(value, localfile);
-		//currentcolumn = ui.tW_detail->rowCount();
-		//ui.tW_detail->insertRow(currentcolumn);
-		//QPushButton* btn = new QPushButton(ui.tW_detail);
-		//btn->setText(localfile);
-		//btn->setStyleSheet("text-align:right;");
-		//btn->resize(ui.tW_detail->size().width(), ui.tW_detail->rowHeight(currentcolumn));
-		//ui.tW_detail->setCellWidget(currentcolumn, 1, btn);
-		//ui.tW_detail->setSpan(currentcolumn, 0, 1, 2);
-		//QObject::connect(btn, &QPushButton::clicked, [=]() {
-		//	QString dirpath = QFileDialog::getExistingDirectory(this, "Ñ¡ÔñÄ¿Â¼", "./", QFileDialog::ShowDirsOnly);
-		//	if (dirpath.length() > 0)
-		//	{
-		//		if (m_camera->SetLocalCameraPath(dirpath))
-		//		{
-		//			btn->setText(dirpath);
-		//			btn->setWhatsThis(dirpath);
-		//		}
-		//		b_changeCamera = true;
-		//	}
-		//});
-
-		std::string cur;
-		m_camera->getCurrentTrigger(cur);
-		if ("NONE" != cur)
+		currentcolumn = ui.tW_detail->rowCount();
+		ui.tW_detail->setFocusPolicy(Qt::NoFocus);
+		ui.tW_detail->insertRow(currentcolumn);
+		ui.tW_detail->setItem(currentcolumn, 0, new QTableWidgetItem("Format"));
+		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsEditable));
+		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsSelectable));
+		ls_str.clear();
+		m_camera->getFormatList(ls_str);
+		if (ls_str.size() != 0)
 		{
-			ui.tW_detail->setRowHeight(currentcolumn, 0);
-		}
+			QComboBox* cb_Formate = new QComboBox(this);
+			for (std::list<std::string>::iterator it = ls_str.begin(); it != ls_str.end(); ++it)
+			{
+				cb_Formate->addItem(QString::fromStdString(*it));
+			}
+			connect(cb_Formate, QOverload<int>::of(&QComboBox::activated),
+				[=](int index) {
+				QString str = cb_Formate->currentText();
+				m_camera->setCurrentFormat(str.toStdString());
+			});
+			std::string cur;
+			m_camera->getCurrentFormat(cur);
+			cb_Formate->setCurrentText(QString::fromStdString(cur));
+			ui.tW_detail->setCellWidget(currentcolumn, 1, cb_Formate);
 
+		}
 		int w = 0, h = 0, x = 0, y = 0;
 		currentcolumn = ui.tW_detail->rowCount();
 		ui.tW_detail->insertRow(currentcolumn);
@@ -276,6 +271,14 @@ void QtCameraTest::fillCamParamValue()
 
 	}
 
+	ui.tW_detail->verticalHeader()->setSectionResizeMode(QHeaderView::Custom);
+	std::string cur;
+	m_camera->getCurrentTrigger(cur);
+	if ("NONE" != cur)
+	{
+		ui.tW_detail->setRowHeight(1, 0);
+	}
+
 	ui.tW_detail->blockSignals(false);
 }
 
@@ -327,6 +330,7 @@ void QtCameraTest::onInitCamera()
 	m_camera = CreateLocalCamera();
 	if (m_camera->initCamera(ui.textEdit_sn->toPlainText().toLocal8Bit()))
 	{
+		LOGD("initCamera setCameraInt");
 		m_camera->SetCallback(CallbackGetImg, this);
 		m_camera->setCameraInt(cameramanager::WIDTH, di.width);
 		m_camera->setCameraInt(cameramanager::HEIGHT, di.height);
@@ -334,8 +338,6 @@ void QtCameraTest::onInitCamera()
 		m_camera->setCameraInt(cameramanager::OFFSETY, di.offsety);
 		m_camera->setCameraInt(cameramanager::FRAMES, di.frames);
 		m_camera->setCameraInt(cameramanager::EXPOUSETIME, di.expousetime);
-
-
 		fillCamParamValue();
 	}
 
@@ -458,7 +460,7 @@ void QtCameraTest::onCameraCellChange(int r, int c)
 	((QTableWidget*)sender())->blockSignals(true);
 	switch (r)
 	{
-	case 2:
+	case 3:
 	{
 		int values = ((QTableWidget*)sender())->item(r, c)->text().toInt();
 		if (m_camera)
@@ -476,7 +478,7 @@ void QtCameraTest::onCameraCellChange(int r, int c)
 
 		break;
 	}
-	case 3:
+	case 4:
 	{
 		int values = ((QTableWidget*)sender())->item(r, c)->text().toInt();
 		if (m_camera)
@@ -493,7 +495,7 @@ void QtCameraTest::onCameraCellChange(int r, int c)
 		((QTableWidget*)sender())->item(r + 2, 0)->setText(sts);
 		break;
 	}
-	case 4:
+	case 5:
 	{
 		int values = ((QTableWidget*)sender())->item(r, c)->text().toInt();
 		if (m_camera)
@@ -510,7 +512,7 @@ void QtCameraTest::onCameraCellChange(int r, int c)
 		((QTableWidget*)sender())->item(r - 2, 0)->setText(sts);
 		break;
 	}
-	case 5:
+	case 6:
 	{
 		int values = ((QTableWidget*)sender())->item(r, c)->text().toInt();
 		int valueBefore = values;
@@ -529,8 +531,32 @@ void QtCameraTest::onCameraCellChange(int r, int c)
 
 		break;
 	}
+	case 7:
+	{
+		int values = ((QTableWidget*)sender())->item(r, c)->text().toInt();
+		int valueBefore = values;
+		if (m_camera)
+			m_camera->stopGrabbing();
+		m_camera->setCameraInt(cameramanager::EXPOUSETIME, values);
+		m_camera->getCameraInt(cameramanager::EXPOUSETIME, values);
+		di.expousetime = values;
+		((QTableWidget*)sender())->item(r, c)->setText(QString::number(values));
+		((QSlider*)ui.tW_detail->cellWidget(r+1, 1))->setValue(values);
+		break;
+	}
 	default:
 		break;
 	}
 	((QTableWidget*)sender())->blockSignals(false);
 }
+
+void QtCameraTest::onslotChangeTriggerSource(QString trigger) {
+
+	LOGD("onslotChangeTriggerSource,tigger:{}", trigger.toStdString());
+	if ("NONE" != trigger)
+		ui.tW_detail->setRowHeight(1, 0);
+	else
+	{
+		ui.tW_detail->setRowHeight(1, ui.tW_detail->rowHeight(2));
+	}
+};

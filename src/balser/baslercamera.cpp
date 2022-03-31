@@ -83,10 +83,6 @@ namespace smartmore
 					LOGD("TriggerModeEnums: TriggerMode_On");
 				}
 				std::string str;
-				//if(m_camera->IsUsb())
-				//{
-				//	m_camera->UserSetDefault.SetValue(UserSetDefault_UserSet1);
-				//}
 				m_camera->Open();
 				m_camera->UserSetSelector.SetValue(UserSetSelector_UserSet1);
 				m_camera->UserSetLoad.Execute();
@@ -435,15 +431,15 @@ namespace smartmore
 			}
 			case cameramanager::EXPOUSETIME:
 			{
-				//LOGD("setCameraInt EXPOUSETIME");
-				//if (m_camera->IsGigE())
-				//{
-				//	m_camera->ExposureTimeAbs.SetValue(value);
-				//}
-				//if (m_camera->IsUsb())
-				//{
-				//	m_camera->ExposureTime.SetValue(value);
-				//}
+				LOGD("setCameraInt EXPOUSETIME");
+				if (m_camera->IsGigE())
+				{
+					m_camera->ExposureTimeAbs.SetValue(value);
+				}
+				if (m_camera->IsUsb())
+				{
+					m_camera->ExposureTime.SetValue(value);
+				}
 				break;
 			}
 			case cameramanager::CAMIMGCOUNT:

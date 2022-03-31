@@ -26,7 +26,7 @@ private:
 	cameramanager::DeviceInfo di;
     cameramanager::ICameraDevice* m_camera= nullptr;
 	QComboBox* cb_triggerSource = nullptr;
-	cv::Mat temp, temp_resize;
+	cv::Mat temp, temp_resize,m_Live;
 	QImage Qtemp;
     //////////////////////////////////////////////////////////////////////////
 	QString m_sSavePath;
@@ -53,4 +53,5 @@ public slots:
 	void onCreateNewFolder();
 	void onCameraCellChange(int, int);
 	void onslotChangeTriggerSource(QString trigger); 
+	void onSavePic();
 };

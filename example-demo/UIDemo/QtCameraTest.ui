@@ -16,29 +16,8 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,2">
     <item>
-     <layout class="QGridLayout" name="gridLayout" columnstretch="1,2">
-      <item row="5" column="0" colspan="2">
-       <widget class="QTableWidget" name="tW_detail">
-        <property name="font">
-         <font>
-          <pointsize>21</pointsize>
-         </font>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="font">
-         <font>
-          <pointsize>21</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>已有DLL：</string>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="0" colspan="2">
+     <layout class="QGridLayout" name="gridLayout" columnstretch="1,1,1,1">
+      <item row="7" column="0" colspan="4">
        <widget class="QFrame" name="frame">
         <property name="font">
          <font>
@@ -53,17 +32,76 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="comboBox_HaveDll">
+      <item row="6" column="0">
+       <widget class="QCheckBox" name="cB_recode">
         <property name="font">
          <font>
-          <family>Agency FB</family>
+          <pointsize>21</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Recoding</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0" colspan="4">
+       <widget class="QTableWidget" name="tW_detail">
+        <property name="font">
+         <font>
           <pointsize>21</pointsize>
          </font>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
+      <item row="3" column="0" colspan="4">
+       <widget class="QPushButton" name="pB_start">
+        <property name="font">
+         <font>
+          <pointsize>21</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Start</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="4">
+       <widget class="QPushButton" name="pB_stop">
+        <property name="font">
+         <font>
+          <pointsize>21</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Stop</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QPushButton" name="pB_NF">
+        <property name="font">
+         <font>
+          <pointsize>21</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>New_Folder</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="2" colspan="2">
+       <widget class="QPushButton" name="pB_Save">
+        <property name="font">
+         <font>
+          <pointsize>21</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Save</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2">
        <widget class="QTextEdit" name="textEdit_sn">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Ignored">
@@ -81,11 +119,23 @@
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'SimSun'; font-size:21pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;23983878&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;23983878&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="0" column="0" colspan="2">
+       <widget class="QLabel" name="label">
+        <property name="font">
+         <font>
+          <pointsize>21</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>已有DLL：</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2" colspan="2">
        <widget class="QPushButton" name="pB_init">
         <property name="font">
          <font>
@@ -97,51 +147,13 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="4" column="0" colspan="2">
-       <widget class="QPushButton" name="pB_stop">
+      <item row="0" column="2" colspan="2">
+       <widget class="QComboBox" name="comboBox_HaveDll">
         <property name="font">
          <font>
+          <family>Agency FB</family>
           <pointsize>21</pointsize>
          </font>
-        </property>
-        <property name="text">
-         <string>Stop</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0" colspan="2">
-       <widget class="QPushButton" name="pB_start">
-        <property name="font">
-         <font>
-          <pointsize>21</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Start</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="1">
-       <widget class="QPushButton" name="pB_NF">
-        <property name="font">
-         <font>
-          <pointsize>21</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>New_Folder</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0">
-       <widget class="QCheckBox" name="cB_recode">
-        <property name="font">
-         <font>
-          <pointsize>21</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Recoding</string>
         </property>
        </widget>
       </item>
@@ -171,7 +183,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1587</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

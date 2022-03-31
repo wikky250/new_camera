@@ -13,7 +13,7 @@ QtCameraTest::QtCameraTest(QWidget *parent)
 	ui.setupUi(this);
 	AppPath = qApp->applicationDirPath();//exeËùÔÚÄ¿Â¼
 	readParam();
-
+	onCreateNewFolder();
 	initProgram();
 	initCameraParamList();
 	QObject::connect(ui.pB_init, SIGNAL(clicked()), this, SLOT(onInitCamera()));
@@ -22,6 +22,7 @@ QtCameraTest::QtCameraTest(QWidget *parent)
 	QObject::connect(ui.cB_recode, SIGNAL(toggled(bool)), this, SLOT(onCheckBoxtoSelectSavePath(bool)));
 	QObject::connect(ui.pB_NF, SIGNAL(clicked()), this, SLOT(onCreateNewFolder()));
 	QObject::connect(ui.tW_detail, SIGNAL(clicked()), this, SLOT(onCreateNewFolder()));
+	QObject::connect(ui.pB_Save, SIGNAL(clicked()), this, SLOT(onSavePic()));
 }
 
 void QtCameraTest::initProgram()
@@ -361,6 +362,7 @@ bool QtCameraTest::GetImageFromCam()
 	if (b)
 	{
 		memcpy(m.data, (char*)p, w * h * c);
+		m.copyTo(m_Live);
 		int zz = ui.labelshow->frameWidth();
 		if (m.channels() == 3)
 		{
@@ -559,4 +561,13 @@ void QtCameraTest::onslotChangeTriggerSource(QString trigger) {
 	{
 		ui.tW_detail->setRowHeight(1, ui.tW_detail->rowHeight(2));
 	}
-};
+}
+void QtCameraTest::onSavePic()
+{
+	QDateTime ti = QDateTime::currentDateTime();
+	QString path = m_sSavePath + "/" + ti.toString("HH_mm_ss_zzz") + ".bmp";
+	async(launch::async, [](cv::Mat img, std::string path) {
+		cv::imwrite(path, img);
+	}, m_Live, path.toStdString());
+}
+;

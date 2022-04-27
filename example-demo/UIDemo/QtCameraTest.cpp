@@ -21,7 +21,6 @@ QtCameraTest::QtCameraTest(QWidget *parent)
 	QObject::connect(ui.pB_stop, SIGNAL(clicked()), this, SLOT(onStopCamera()));
 	QObject::connect(ui.cB_recode, SIGNAL(toggled(bool)), this, SLOT(onCheckBoxtoSelectSavePath(bool)));
 	QObject::connect(ui.pB_NF, SIGNAL(clicked()), this, SLOT(onCreateNewFolder()));
-	QObject::connect(ui.tW_detail, SIGNAL(clicked()), this, SLOT(onCreateNewFolder()));
 	QObject::connect(ui.pB_Save, SIGNAL(clicked()), this, SLOT(onSavePic()));
 }
 
@@ -418,7 +417,7 @@ void QtCameraTest::onStartCamera()
 	if (m_camera)
 	{
 		m_camera->startGrabbing(); 
-		ui.tW_detail->setEnabled(false);
+		//ui.tW_detail->setEnabled(false);
 	}
 }
 
@@ -427,7 +426,7 @@ void QtCameraTest::onStopCamera()
 	if (m_camera)
 	{
 		m_camera->stopGrabbing();
-		ui.tW_detail->setEnabled(true);
+		//ui.tW_detail->setEnabled(true);
 	}
 }
 

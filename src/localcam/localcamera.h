@@ -6,6 +6,7 @@ class  LocalCamera:public cameramanager::ICameraDevice
 {
 public:
 	char* BGRdata = nullptr;
+	std::vector<std::string>::iterator m_currentReadIterator;
 	int w, h, c;
 	int m_fps = 5;
 	bool m_grabbing = false;

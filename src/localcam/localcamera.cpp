@@ -76,6 +76,7 @@ namespace smartmore
 				c = 3;
 			}
 			m_trigger = 0;
+			m_currentReadIterator = m_vFilePath.begin();
 			return true;
 
 		}
@@ -104,12 +105,14 @@ namespace smartmore
 		return ret;
 	}
 
-	void catchIncircle(LocalCamera * local)
+	void catchIncircle(LocalCamera * local,bool _continue = true)
 	{
 		cv::Mat img;
-		for (std::vector<std::string>::iterator it = local->m_vFilePath.begin(); it != local->m_vFilePath.end(); ++it)
+		if (local->m_vFilePath.end() == local->m_currentReadIterator)
+			local->m_currentReadIterator = local->m_vFilePath.begin();
+		for (; local->m_currentReadIterator != local->m_vFilePath.end(); ++local->m_currentReadIterator)
 		{
-			img = cv::imread(*it);
+			img = cv::imread(*local->m_currentReadIterator);
 			if (img.channels()!=3)
 			{
 				cv::cvtColor(img.clone(), img, cv::COLOR_GRAY2RGB);
@@ -129,6 +132,11 @@ namespace smartmore
 				local->m_grabbing = false;
 				break;
 			}
+			if (!_continue)
+			{
+				++local->m_currentReadIterator;
+				break;
+			}
 		}
 	}
 	bool LocalCamera::startGrabbing()
@@ -136,8 +144,11 @@ namespace smartmore
 		m_stop = false;
 		if (m_grabbing)
 			return false;
-		std::thread cam1(catchIncircle, this);
-		cam1.detach();
+		if (0 == m_trigger)
+		{
+			std::thread cam1(catchIncircle, this, true);
+			cam1.detach();
+		}
 		m_grabbing = true;
 		return true;
 	}
@@ -228,7 +239,7 @@ namespace smartmore
 	bool LocalCamera::setCurrentTrigger(std::string str)
 	{
 		if (str == "NONE")
-			m_trigger == 0;
+			m_trigger = 0;
 		if (str == "BYUSER")
 			m_trigger =1;
 		return false;
@@ -236,7 +247,10 @@ namespace smartmore
 
 	bool LocalCamera::triggerOnce()
 	{
-		return false;
+		if (!m_grabbing)
+			return false;
+		std::async(std::launch::async, catchIncircle, this, false);
+		return true;
 	}
 
 	bool LocalCamera::getCurrentFormat(std::string & str)

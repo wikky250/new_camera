@@ -38,6 +38,11 @@ public:
 	virtual bool setCurrentTrigger(std::string str);
 	virtual bool getTriggerList(std::list<std::string>& list);
 
+
+
+	virtual bool triggerOnce();
+
+
 	virtual bool getCurrentFormat(std::string &str);
 	virtual bool setCurrentFormat(std::string str);
 	virtual bool getFormatList(std::list<std::string>& list);

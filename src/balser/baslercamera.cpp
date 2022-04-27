@@ -397,6 +397,8 @@ namespace smartmore
 
 	bool BaslerCamera::setCameraInt(cameramanager::CameraInt param, int value)
 	{
+		if (m_camera->IsGrabbing())
+			return false;
 		try
 		{
 			switch (param)
@@ -589,6 +591,31 @@ namespace smartmore
 		return false;
 	}
 
+	bool BaslerCamera::triggerOnce()
+	{
+		try
+		{
+			if (!m_camera)
+			{
+				return false;
+			}
+			if (m_camera->IsGrabbing())
+			{
+				m_camera->TriggerSoftware.Execute();
+				return true;
+			}
+			
+
+		}
+		catch (const GenericException& e)
+		{
+			// Error handling.
+			LOGE("Pylon ERROR:{} ", e.GetDescription());
+			return false;
+		}
+		return false;
+	}
+
 	bool BaslerCamera::getCurrentFormat(std::string & str)
 	{
 		try
@@ -636,7 +663,6 @@ namespace smartmore
 			return false;
 		}
 		return false;
-		return false;
 	}
 
 	bool BaslerCamera::getFormatList(std::list<std::string>& list)
@@ -667,7 +693,6 @@ namespace smartmore
 		}
 
 		LOGD("device_vendor_name:{} Get Formate List", m_camera->GetDeviceInfo().GetSerialNumber());
-		return false;
 		return false;
 	}
 

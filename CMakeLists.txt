@@ -7,7 +7,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(CAMERA_HIK_SUPPORT "Support Hik SDK" OFF)
 option(CAMERA_LOCAL_SUPPORT "Support Local SDK" ON)
-option(CAMERA_BALSER_SUPPORT "Support Balser SDK" OFF)
+option(CAMERA_BALSER_SUPPORT "Support Balser SDK" ON )
 option(CAMERA_DALSA_SUPPORT "Support Dalsa SDK"   OFF)
 option(CAMERA_BAUMER_SUPPORT "Support Baumer SDK"   OFF)
 option(CAMERA_DAHUA_SUPPORT "Support Dahua SDK"   OFF)

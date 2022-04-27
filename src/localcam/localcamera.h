@@ -5,7 +5,14 @@ namespace smartmore
 class  LocalCamera:public cameramanager::ICameraDevice
 {
 public:
+	char* BGRdata = nullptr;
+	int w, h, c;
+	int m_fps = 5;
+	bool m_grabbing = false;
+	bool m_stop = false;
 	void* pUser = nullptr;
+	int m_trigger = -1;
+
 	cameramanager::CallbackImage callbackfunc = nullptr;
 	LocalCamera();
     LocalCamera(const cameramanager::DeviceInfo &device_info);
@@ -35,10 +42,10 @@ public:
 	virtual bool SetCallback(cameramanager::CallbackImage func, void* p);
 	virtual bool getImage(UINT_PTR&);
 
+	std::vector<std::string> m_vFilePath;
 private:
     cameramanager::DeviceInfo m_device_info;
     bool m_extern_trigger = false;
-	std::vector<std::string> m_vFilePath;
 
 	string m_sfolderPath;
 

@@ -299,9 +299,9 @@ void QtCameraTest::fillCamParamValue()
 	std::string cur;
 	m_camera->getCurrentTrigger(cur);
 	if ("NONE" != cur)
-	{
 		ui.tW_detail->setRowHeight(1, 0);
-	}
+	else
+		ui.tW_detail->setRowHeight(1, ui.tW_detail->rowHeight(2));
 
 	ui.tW_detail->blockSignals(false);
 }
@@ -485,7 +485,7 @@ void QtCameraTest::onCameraCellChange(int r, int c)
 	((QTableWidget*)sender())->blockSignals(true);
 	switch (r)
 	{
-	case 3:
+	case 4:
 	{
 		int values = ((QTableWidget*)sender())->item(r, c)->text().toInt();
 		if (m_camera)
@@ -503,7 +503,7 @@ void QtCameraTest::onCameraCellChange(int r, int c)
 
 		break;
 	}
-	case 4:
+	case 5:
 	{
 		int values = ((QTableWidget*)sender())->item(r, c)->text().toInt();
 		if (m_camera)
@@ -520,7 +520,7 @@ void QtCameraTest::onCameraCellChange(int r, int c)
 		((QTableWidget*)sender())->item(r + 2, 0)->setText(sts);
 		break;
 	}
-	case 5:
+	case 6:
 	{
 		int values = ((QTableWidget*)sender())->item(r, c)->text().toInt();
 		if (m_camera)
@@ -537,7 +537,7 @@ void QtCameraTest::onCameraCellChange(int r, int c)
 		((QTableWidget*)sender())->item(r - 2, 0)->setText(sts);
 		break;
 	}
-	case 6:
+	case 7:
 	{
 		int values = ((QTableWidget*)sender())->item(r, c)->text().toInt();
 		int valueBefore = values;
@@ -556,7 +556,7 @@ void QtCameraTest::onCameraCellChange(int r, int c)
 
 		break;
 	}
-	case 7:
+	case 8:
 	{
 		int values = ((QTableWidget*)sender())->item(r, c)->text().toInt();
 		int valueBefore = values;

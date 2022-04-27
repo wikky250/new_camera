@@ -2,6 +2,12 @@ find_package(OpenCV REQUIRED)
 include(fetch/spdlog)
 include(fetch/json)
 
+if(CAMERA_LOCAL_SUPPORT)
+  message(STATUS "src CAMERA_LOCAL_SUPPORT defined")
+  add_subdirectory(localcam)
+  list(APPEND DEP_CAMERA_LIB local_camera)
+endif()
+
 if(CAMERA_HIK_SUPPORT)
   message(STATUS "src CAMERA_HIK_SUPPORT defined")
   add_subdirectory(hik)

@@ -140,6 +140,29 @@ void QtCameraTest::fillCamParamValue()
 			ui.tW_detail->setCellWidget(currentcolumn, 1, cb_Formate);
 
 		}
+
+
+
+		//button
+		currentcolumn = ui.tW_detail->rowCount();
+		ui.tW_detail->insertRow(currentcolumn);
+
+		sts = QString::fromLocal8Bit("ÊÖ¶¯´¥·¢");
+		ui.tW_detail->setItem(currentcolumn, 0, new QTableWidgetItem(sts));
+		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsEditable));
+		ui.tW_detail->item(currentcolumn, 0)->setFlags(ui.tW_detail->item(currentcolumn, 0)->flags() & (~Qt::ItemIsSelectable));
+
+		QPushButton* cb_triggerOnce = new QPushButton;
+		cb_triggerOnce->setText("Trigger");
+		connect(cb_triggerOnce, &QPushButton::clicked,
+			[=]() {
+			m_camera->triggerOnce();
+		});
+
+		ui.tW_detail->setCellWidget(currentcolumn, 1, cb_triggerOnce);
+
+
+
 		int w = 0, h = 0, x = 0, y = 0;
 		currentcolumn = ui.tW_detail->rowCount();
 		ui.tW_detail->insertRow(currentcolumn);
